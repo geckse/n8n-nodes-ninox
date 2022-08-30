@@ -5,7 +5,7 @@ import {
 	INodeProperties,
 } from 'n8n-workflow';
 
-export class NinoxCredentialsApi implements ICredentialType {
+export class NinoxApi implements ICredentialType {
 	name = 'ninoxApi';
 	displayName = 'Ninox API Credentials';
 	documentationUrl = 'https://docs.ninox.com/de/altes-handbuch/ninox-api/ninox-rest-api';
