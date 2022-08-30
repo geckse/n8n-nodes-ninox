@@ -223,8 +223,8 @@ export class Ninox implements INodeType {
 					{
 						name: 'Update',
 						value: 'update',
-						description: 'Update the record data in a table',
-						action: 'Update the record data in a table',
+						description: 'Update the data of a record in a table',
+						action: 'Update the data of a record in a table',
 						routing: {
 							request: {
 								method: 'POST',
@@ -265,6 +265,10 @@ export class Ninox implements INodeType {
 											bodyData.fields = cleanedFields;
 										}
 
+										if(bodyData.id != recordId){
+											throw new Error('The Record ID does not match the provided recordId. Consider using an expression to dynamical update multiple records.');
+										}
+										
 										// and add it
 										requestOptions.body = bodyData;
 
