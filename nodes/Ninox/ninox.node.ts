@@ -144,6 +144,80 @@ export class Ninox implements INodeType {
 				required: true,
 				description: 'Delete a record.',
 			},
+
+			// ----------------------------------
+			//         Pagination behavior
+			// ----------------------------------
+			{
+				displayName: 'Return All',
+				name: 'returnAll',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						operation: ['list'],
+					},
+				},
+				default: false,
+				routing: {
+					operations: {
+						pagination: {
+							type: 'offset',
+							properties: {
+								limitParameter: 'perPage',
+								offsetParameter: 'page',
+								pageSize: 250,
+								type: 'query',
+							},
+						},
+					}
+				},
+				description: 'Whether to return all results or only up to a given limit',
+			},
+			{
+				displayName: 'Page',
+				name: 'page',
+				type: 'number',
+				displayOptions: {
+					show: {
+						operation: ['list'],
+						returnAll: [false],
+					},
+				},
+				typeOptions: {
+				},
+				routing: {
+					send: {
+						type: 'query',
+						property: 'page',
+					},
+				},
+				default: 0,
+				description: 'The page of results to return',
+			},
+			{
+				displayName: 'Limit',
+				name: 'limit',
+				type: 'number',
+				displayOptions: {
+					show: {
+						operation: ['list'],
+						returnAll: [false],
+					},
+				},
+				typeOptions: {
+					minValue: 1,
+					maxValue: 250,
+				},
+				routing: {
+					send: {
+						type: 'query',
+						property: 'perPage',
+					},
+				},
+				default: 100,
+				description: 'Max number of results to return',
+			},
+
 			// ----------------------------------
 			//         All Fields behavior
 			// ----------------------------------
@@ -207,7 +281,7 @@ export class Ninox implements INodeType {
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
 							}
 						},
-					},
+					},				
 					{
 						name: 'Read',
 						value: 'read',
