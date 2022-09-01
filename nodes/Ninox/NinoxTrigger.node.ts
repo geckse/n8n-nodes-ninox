@@ -19,10 +19,10 @@ export class NinoxTrigger implements INodeType {
 		icon: 'file:ninox.svg',
 		group: ['trigger'],
 		version: 1,
-		subtitle: '={{$parameter["event"]}}',
+		subtitle: 'on record change',
 		description: 'Starts the workflow when Ninox events occur',
 		defaults: {
-			name: 'Ninox',
+			name: 'Ninox Trigger',
 			color: '#4970FF',
 		},
 		polling: true,
@@ -147,7 +147,6 @@ export class NinoxTrigger implements INodeType {
 			qs.perPage = 1;
 			records = await apiRequest.call(this, 'GET', endpoint, {}, qs);
 		} else {
-			console.log(qs);
 			records = await apiRequestAllItems.call(this, 'GET', endpoint, {}, qs);
 		}
 
