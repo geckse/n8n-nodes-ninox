@@ -127,7 +127,7 @@ export class Ninox implements INodeType {
 				},
 				default: '',
 				required: true,
-				description: 'Update a record.',
+				description: 'Update a record. Use an expression to update many incoming records.',
 			},
 			{
 				displayName: 'Record ID',
