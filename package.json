@@ -33,7 +33,8 @@
       "dist/credentials/NinoxApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Ninox/Ninox.node.js"
+      "dist/nodes/Ninox/Ninox.node.js",
+      "dist/nodes/Ninox/NinoxTrigger.node.js"
     ]
   },
   "devDependencies": {
