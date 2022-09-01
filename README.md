@@ -1,47 +1,54 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+<img src="https://raw.githubusercontent.com/geckse/n8n-nodes-ninox/master/nodes/Ninox/ninox.svg" align="left" height="74" width="74"> 
 
-# n8n-nodes-starter
+# Ninox Nodes for n8n.io
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](n8n.io). It includes the node linter and other dependencies.
+This community package contains two nodes to integrate your Ninox Database with n8n.io.
+It adds two nodes:
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+| Ninox Node  | Ninox Trigger Node |
+| ------------- | ------------- |
+| Operations: List, read, create, update delete Records  | Events: on create or change of records via polling |
 
-## Prerequisites
+## State of Development
 
-You need the following installed on your development machine:
+- [x] Properly authenticate with Ninox
+- [x] Create Ninox Record(s) via Node
+- [x] Get a single Record by ID
+- [x] Update Ninox Records
+- [x] Update Ninox Record by ID
+- [x] Trigger Node listening for changes in a table
+- [ ] Pagination on List Operation
+- [ ] Ordering of List Operation
+- [ ] Make use of Filter Parameter
+- [ ] Get File Attachments
+- [ ] Add new File Attachments
+- [ ] Remove File Attachments
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 16. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-	```
-	npm install n8n -g
-	```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
 
+## Installation
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-## Using this starter
+## Credentials
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+Since the nodes communicate with the Ninox REST API you'll have to obtain an Ninox API Key and add it as Ninox API Credential in n8n.io.
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-    ```
-    git clone https://github.com/<your organization>/<your-repo-name>.git
-    ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+Follow these steps:
+1. Goto your [Ninox](https://app.ninox.com/).
+2. Click the __cog__ icon in top right corner of your screen.
+3. Click __integrations__ in the presented menu.
+4. Copy Key and create new Ninox API Credentials in your n8n.io instance.
 
-## More information
+**Keep in mind: This API-Key provides access to all your Ninox-Teams and all the Ninox Databases of these teams. You should handle this keys with care.**
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+## Compatibility
 
-## License
+The Latest Version of n8n. If you encounter any problem, feel free to [open an issue](https://github.com/geckse/n8n-nodes-ninox) on Github. 
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
+* [Ninox API Documentation]([https://finnhub.io/docs/api](https://docs.ninox.com/de/altes-handbuch/ninox-api/ninox-rest-api))
+
+## Integration Approach
+
+This node communicates with the [Ninox REST API](https://docs.ninox.com/de/altes-handbuch/ninox-api/ninox-rest-api). The CRUD Operations are simple REST-API calls. For the Trigger Node I choosed to work with the sequence id. Everytime a change is made or a record is created the sequence number in your ninox table will be incremented by one. That made it pretty easy to get the difference between two sequences. 
