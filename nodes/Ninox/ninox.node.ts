@@ -444,7 +444,7 @@ export class Ninox implements INodeType {
 				placeholder: 'Add Option',
 				options: [
 					{
-						displayName: 'Sort',
+						displayName: 'Sort by field',
 						name: 'sort',
 						placeholder: 'Add Sort Rule',
 						description: 'Defines how the returned records should be ordered',
@@ -453,6 +453,16 @@ export class Ninox implements INodeType {
 							multipleValues: true,
 						},
 						default: {},
+						displayOptions: {
+							hide: {
+								sortUpdate: [
+									true,
+								],
+								sortNew: [
+									true,
+								],
+							},
+						},
 						options: [
 							{
 								name: 'property',
@@ -469,7 +479,7 @@ export class Ninox implements INodeType {
 												type: 'query',
 												property: 'order',
 											},
-										},
+										}
 									},
 									{
 										displayName: 'Direction',
@@ -508,6 +518,95 @@ export class Ninox implements INodeType {
 							},
 						],
 					},
+					{
+						displayName: 'Sort by latest modified',
+						name: 'sortUpdate',
+						description: 'Show last changed records first (not combinable with order)',
+						type: 'boolean',
+						routing: {
+							send: {
+								type: 'query',
+								property: 'updated',
+								value: 'true',
+							},
+						},
+						displayOptions: {
+							hide: {
+								sort: [
+									true
+								],
+								sortNew: [
+									true
+								],
+							},
+						},
+						default: true,
+					},
+					{
+						displayName: 'Sort by latest created',
+						name: 'sortNew',
+						description: 'Show newest records first (not combinable with order)',
+						type: 'boolean',
+						routing: {
+							send: {
+								type: 'query',
+								property: 'new',
+								value: 'true',
+							},
+						},
+						displayOptions: {
+							hide: {
+								sort: [
+									true,
+								],
+								sortUpdate: [
+									true
+								],
+							},
+						},
+						default: true,
+					},
+					{
+						displayName: 'Filters',
+						name: 'filters',
+						description: 'Return records that meet the criteria defined as query parameters',
+						type: 'string',
+						placeholder: '{"fields": {"Email": "example@mail.com"}}',
+						routing: {
+							send: {
+								type: 'query',
+								property: 'filters'
+							},
+						},
+						default: '',
+					},
+					{
+						displayName: 'Since ID',
+						name: 'sinceId',
+						description: 'Show only records with a larger ID than the given ID',
+						type: 'number',
+						routing: {
+							send: {
+								type: 'query',
+								property: 'sinceId'
+							},
+						},
+						default: '',
+					},
+					{
+						displayName: 'Since Sequence',
+						name: 'sinceSq',
+						description: 'Show only records created or modified since this sync sequence number',
+						type: 'number',
+						routing: {
+							send: {
+								type: 'query',
+								property: 'sinceSq'
+							},
+						},
+						default: '',
+					},
+
 				],
 			},	
 		],
