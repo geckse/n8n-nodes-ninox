@@ -17,9 +17,9 @@ It adds two nodes:
 - [x] Update Ninox Records
 - [x] Update Ninox Record by ID
 - [x] Trigger Node listening for changes in a table
-- [x] Pagination on List Operation
+- [x] Pagination of List Operation
 - [x] Ordering of List Operation
-- [ ] Make use of Filter Parameter
+- [x] Make use of Filter Parameter
 - [ ] Get File Attachments
 - [ ] Add new File Attachments
 - [ ] Remove File Attachments
