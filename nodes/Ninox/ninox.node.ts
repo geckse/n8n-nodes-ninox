@@ -6,7 +6,8 @@ import {
 	INodeExecutionData,
 	IExecuteSingleFunctions, 
 	IHttpRequestOptions, 
-	IDataObject,  
+	IDataObject, 
+	NodeOperationError, 
 	IHttpRequestMethods} from 'n8n-workflow';
 
 import { apiRequest, apiRequestAllItems } from './transport';
@@ -660,7 +661,15 @@ export class Ninox implements INodeType {
 	
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
+		const operation = this.getNodeParameter('operation', 0) as string;
 		const items = this.getInputData();
+
+		const team = this.getNodeParameter('teamId', 0) as string;
+
+		const base = this.getNodeParameter('databaseId', 0) as string;
+
+		const table = this.getNodeParameter('tableId', 0) as string;
+
 		const returnData: INodeExecutionData[] = [];
 		let responseData;
 
@@ -670,15 +679,9 @@ export class Ninox implements INodeType {
 		let body = {} as any;
 		let qs = {} as any;
 
-		const operation = this.getNodeParameter('operation', 0) as string;
-
-		const team = this.getNodeParameter('teamId', 0) as string;
-
-		const base = this.getNodeParameter('databaseId', 0) as string;
-
-		const table = this.getNodeParameter('tableId', 0) as string;
-
-
+		// ----------------------------------
+		//         Update & Append
+		// ----------------------------------
 		if (operation === 'update' || operation === 'append') {
 
 			requestMethod = 'POST';
