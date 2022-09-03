@@ -101,8 +101,8 @@ export class Ninox implements INodeType {
 					{
 						name: 'Ninox Script',
 						value: 'ninoxScript',
-						description: 'Build your own query using Ninox Script',
-						action: 'Query a table with a Ninox Script',
+						description: 'Send and run a Ninox Script to query data or run actions on your Ninox database',
+						action: 'Send a Ninox Script to your database',
 						routing: {
 							request: {
 								method: 'POST',
