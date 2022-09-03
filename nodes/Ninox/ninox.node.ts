@@ -92,12 +92,108 @@ export class Ninox implements INodeType {
 						value: 'update',
 						description: 'Update the data of a record in a table',
 						action: 'Update the data of a record in a table',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
+							},
+							send: {
+								paginate: false,
+								preSend: [
+									async function (
+										this: IExecuteSingleFunctions,
+										requestOptions: IHttpRequestOptions,
+									): Promise<IHttpRequestOptions> {
+										let item = this.getInputData() as any;
+										let recordId = this.getNodeParameter('recordId');
+										let addAllFields = this.getNodeParameter('addAllFields');
+										let fields = Array<string>();
+										if(!addAllFields){
+											fields = this.getNodeParameter('fields') as string[];
+										}										
+										let bodyData = {} as any;
+
+										// sending complete record, or just the fields?
+										if(item.json.id && item.json.fields){
+											bodyData = item.json;
+										} else { 
+											bodyData = {
+												id: recordId,
+												fields: item.json
+											};
+										}
+
+										// remove fields that should not be sent
+										if(!addAllFields && bodyData.fields){
+											let cleanedFields = {} as any;
+											for(let field of fields){
+												cleanedFields[field] = bodyData.fields[field];
+											}
+											bodyData.fields = cleanedFields;
+										}
+
+										if(bodyData.id != recordId){
+											throw new Error('The Record ID does not match the provided recordId. Consider using an expression to dynamical update multiple records.');
+										}
+
+										// and add it
+										requestOptions.body = bodyData;
+
+										return requestOptions;
+									},
+								],
+								type: 'body'
+							}
+						},
 					},
 					{
 						name: 'Append',
 						value: 'append',
 						description: 'Add multiple items to a table',
 						action: 'Add multiple items to a table',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
+							},
+							send: {
+								paginate: false,
+								preSend: [
+									async function (
+										this: IExecuteSingleFunctions,
+										requestOptions: IHttpRequestOptions,
+									): Promise<IHttpRequestOptions> {
+										let item = this.getInputData() as any;
+										let addAllFields = this.getNodeParameter('addAllFields');
+										let fields = Array<string>();
+										if(!addAllFields){
+											fields = this.getNodeParameter('fields') as string[];
+										}
+										let bodyData = {} as any;
+										// ensure it will be added, even if ids are provided
+										// otherwise it will just update the existing record by ids
+										if(item.json.id) delete item.json.id;
+
+										bodyData = item.json;
+
+										// remove fields that should not be sent
+										if(!addAllFields && bodyData.fields){
+											let cleanedFields = {} as any;
+											for(let field of fields){
+												cleanedFields[field] = bodyData.fields[field];
+											}
+											bodyData.fields = cleanedFields;
+										}
+
+										// and add it
+										requestOptions.body = bodyData;
+
+										return requestOptions;
+									},
+								],
+								type: 'body'
+							}
+						},
 					},
 					{
 						name: 'Ninox Script',
@@ -148,18 +244,6 @@ export class Ninox implements INodeType {
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
 							}
 						},
-					},
-					{
-						name: 'Get Attached Files',
-						value: 'getFile',
-						action: 'Get an attached files from a record by the file id',
-						description: 'Get attachments from a record by file id'
-					},
-					{
-						name: 'Upload a File to a Record',
-						value: 'uploadFile',
-						action: 'Add a file to a record',
-						description: 'Add a file to a record'
 					},
 					{
 						name: 'Delete Attached File',
@@ -658,113 +742,4 @@ export class Ninox implements INodeType {
 			},	
 		],
 	};
-	
-	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-
-		const operation = this.getNodeParameter('operation', 0) as string;
-		const items = this.getInputData();
-
-		const team = this.getNodeParameter('teamId', 0) as string;
-
-		const base = this.getNodeParameter('databaseId', 0) as string;
-
-		const table = this.getNodeParameter('tableId', 0) as string;
-
-		const returnData: INodeExecutionData[] = [];
-		let responseData;
-
-		let endpoint = '';
-		let requestMethod = '' as IHttpRequestMethods;
-
-		let body = {} as any;
-		let qs = {} as any;
-
-		// ----------------------------------
-		//         Update & Append
-		// ----------------------------------
-		if (operation === 'update' || operation === 'append') {
-
-			requestMethod = 'POST';
-			endpoint = `teams/${team}/databases/${base}/tables/${table}/records`;
-
-			body = [] as any;
-
-			let addAllFields = this.getNodeParameter('addAllFields', 0);
-			let fields: string[] = [];
-			if (!addAllFields) {
-				fields = this.getNodeParameter('fields', 0) as string[];
-			}
-
-			for (let i = 0; i < items.length; i++) {
-				try {
-					
-					let recordId = "";
-					if( operation === 'update' ) {
-						recordId = this.getNodeParameter('recordId', i) as string;
-						if( recordId === "" ) {
-							throw new Error("Record ID is empty");
-						}
-					}
-
-					let item = items[i];
-					let bodyData = {} as any;
-					// sending complete record, or just the fields?
-					if (item.json.id && item.json.fields) {
-						bodyData = item.json;
-					} else {
-						bodyData = {
-							id: recordId,
-							fields: item.json
-						};
-					}
-
-					// remove fields that should not be sent
-					if (!addAllFields && bodyData.fields) {
-						let cleanedFields = {} as any;
-						for (let field of fields) {
-							cleanedFields[field] = bodyData.fields[field];
-						}
-						bodyData.fields = cleanedFields;
-					}
-
-					if(operation === 'update' && bodyData.id != recordId){
-						throw new Error('The Record ID does not match the provided recordId. Consider using an expression to dynamical update multiple records.');
-					}
-
-					// if we are appending and having ids, remove them so elements will be created instead of updated
-					if (operation === 'append' && bodyData.id) {
-						delete bodyData.id;
-					}
-
-					// add it to the body, since we create multiple records in a single request
-					body.push(bodyData);
-
-				} catch (error) {
-					if (this.continueOnFail()) {
-						returnData.push({ json: { error: error.message } });
-						continue;
-					}
-					throw error;
-				}
-			}
-
-			// make the request
-			try {
-				responseData = await apiRequest.call(this, requestMethod, endpoint, body, qs);
-				const executionData = this.helpers.returnJsonArray(responseData);
-
-				returnData.push(...executionData);
-
-			} catch (error) {
-				if (this.continueOnFail()) {
-					returnData.push({ json: { error: error.message } });
-				}
-				throw error;
-			}
-
-		}
-
-		return this.prepareOutputData(returnData);
-	}
-
 }
