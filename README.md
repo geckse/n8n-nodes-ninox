@@ -47,7 +47,7 @@ The Latest Version of n8n. If you encounter any problem, feel free to [open an i
 ## Resources
 
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/community-nodes/)
-* [Ninox API Documentation]([https://finnhub.io/docs/api](https://docs.ninox.com/de/altes-handbuch/ninox-api/ninox-rest-api))
+* [Ninox API Documentation](https://docs.ninox.com/de/altes-handbuch/ninox-api/ninox-rest-api)
 
 ## Integration Approach
 
