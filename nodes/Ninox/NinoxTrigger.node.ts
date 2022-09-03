@@ -10,8 +10,6 @@ import {
 
 import { apiRequest, apiRequestAllItems } from './transport';
 
-import moment from 'moment';
-
 export class NinoxTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Ninox Trigger',
