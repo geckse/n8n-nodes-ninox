@@ -1,5 +1,3 @@
-import { IExecuteFunctions } from 'n8n-core';
-
 import { 
 	INodeType, 
 	INodeTypeDescription, 
@@ -10,7 +8,8 @@ import {
 	NodeOperationError, 
 	IHttpRequestMethods} from 'n8n-workflow';
 
-import { apiRequest, apiRequestAllItems } from './transport';
+import { updateRecordsOptions } from './actions/updateRecords';
+import { appendRecordsOptions } from './actions/appendRecords';
 
 export class Ninox implements INodeType {
 	description: INodeTypeDescription = {
@@ -99,49 +98,7 @@ export class Ninox implements INodeType {
 							},
 							send: {
 								paginate: false,
-								preSend: [
-									async function (
-										this: IExecuteSingleFunctions,
-										requestOptions: IHttpRequestOptions,
-									): Promise<IHttpRequestOptions> {
-										let item = this.getInputData() as any;
-										let recordId = this.getNodeParameter('recordId');
-										let addAllFields = this.getNodeParameter('addAllFields');
-										let fields = Array<string>();
-										if(!addAllFields){
-											fields = this.getNodeParameter('fields') as string[];
-										}										
-										let bodyData = {} as any;
-
-										// sending complete record, or just the fields?
-										if(item.json.id && item.json.fields){
-											bodyData = item.json;
-										} else { 
-											bodyData = {
-												id: recordId,
-												fields: item.json
-											};
-										}
-
-										// remove fields that should not be sent
-										if(!addAllFields && bodyData.fields){
-											let cleanedFields = {} as any;
-											for(let field of fields){
-												cleanedFields[field] = bodyData.fields[field];
-											}
-											bodyData.fields = cleanedFields;
-										}
-
-										if(bodyData.id != recordId){
-											throw new Error('The Record ID does not match the provided recordId. Consider using an expression to dynamical update multiple records.');
-										}
-
-										// and add it
-										requestOptions.body = bodyData;
-
-										return requestOptions;
-									},
-								],
+								preSend: [updateRecordsOptions],
 								type: 'body'
 							}
 						},
@@ -158,39 +115,7 @@ export class Ninox implements INodeType {
 							},
 							send: {
 								paginate: false,
-								preSend: [
-									async function (
-										this: IExecuteSingleFunctions,
-										requestOptions: IHttpRequestOptions,
-									): Promise<IHttpRequestOptions> {
-										let item = this.getInputData() as any;
-										let addAllFields = this.getNodeParameter('addAllFields');
-										let fields = Array<string>();
-										if(!addAllFields){
-											fields = this.getNodeParameter('fields') as string[];
-										}
-										let bodyData = {} as any;
-										// ensure it will be added, even if ids are provided
-										// otherwise it will just update the existing record by ids
-										if(item.json.id) delete item.json.id;
-
-										bodyData = item.json;
-
-										// remove fields that should not be sent
-										if(!addAllFields && bodyData.fields){
-											let cleanedFields = {} as any;
-											for(let field of fields){
-												cleanedFields[field] = bodyData.fields[field];
-											}
-											bodyData.fields = cleanedFields;
-										}
-
-										// and add it
-										requestOptions.body = bodyData;
-
-										return requestOptions;
-									},
-								],
+								preSend: [appendRecordsOptions],
 								type: 'body'
 							}
 						},
