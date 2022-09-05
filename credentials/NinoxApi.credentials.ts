@@ -8,7 +8,7 @@ import {
 export class NinoxApi implements ICredentialType {
 	name = 'ninoxApi';
 	displayName = 'Ninox API Credentials';
-	documentationUrl = 'https://docs.ninox.com/de/altes-handbuch/ninox-api/ninox-rest-api';
+	documentationUrl = 'https://docs.ninox.com/en/api/introduction#obtaining-a-personal-access-token';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',

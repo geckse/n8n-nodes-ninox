@@ -1,15 +1,18 @@
 import { 
 	INodeType, 
 	INodeTypeDescription, 
-	INodeExecutionData,
 	IExecuteSingleFunctions, 
 	IHttpRequestOptions, 
 	IDataObject, 
 	NodeOperationError, 
-	IHttpRequestMethods} from 'n8n-workflow';
+	IHttpRequestMethods,
+    INodeExecutionData,
+    IN8nHttpFullResponse} from 'n8n-workflow';
 
 import { updateRecordsOptions } from './actions/updateRecords';
 import { appendRecordsOptions } from './actions/appendRecords';
+import { uploadFileOptions } from './actions/uploadFile';
+import { handleIncommingFile } from './actions/handleIncommingFile';
 
 export class Ninox implements INodeType {
 	description: INodeTypeDescription = {
@@ -169,6 +172,63 @@ export class Ninox implements INodeType {
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
 							}
 						},
+					},
+					{
+						name: 'Get Attached File',
+						value: 'getFile',
+						action: 'Get an attached files from a record by the file name',
+						description: 'Get attachments from a record by file name',
+						routing: {
+							request: {
+								method: 'GET',								
+								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files/{{$parameter.fileName}}',
+							},
+							send: {
+								preSend: [
+									async function(
+									this: IExecuteSingleFunctions,
+									requestOptions: IHttpRequestOptions,
+								): Promise<IHttpRequestOptions> {
+									requestOptions.encoding = 'arraybuffer';
+									requestOptions.returnFullResponse = true;
+									return requestOptions;
+								}
+								],
+							},
+							output: {
+								postReceive: [handleIncommingFile],
+							}
+						},						
+					},
+					{
+						name: 'Upload a File to a Record',
+						value: 'uploadFile',
+						action: 'Add a file to a record',
+						description: 'Add a file to a record',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
+							},
+							send: {
+								paginate: false,
+								preSend: [uploadFileOptions],
+								type: 'body'
+							},
+							output: {
+								postReceive: [
+									async function (
+										this: IExecuteSingleFunctions,
+										items: INodeExecutionData[],
+										response: IN8nHttpFullResponse
+									): Promise<INodeExecutionData[]> {
+										console.log("yooo");
+										console.log(response);
+										return items;
+									}
+								],
+							}
+						},	
 					},
 					{
 						name: 'Delete Attached File',
@@ -345,6 +405,7 @@ export class Ninox implements INodeType {
 						operation: [
 							'listFiles',
 							'getFile',
+							'uploadFile'
 						],
 					},
 				},
@@ -367,7 +428,21 @@ export class Ninox implements INodeType {
 				required: true,
 				description: 'the file id.',
 			},
-
+			{
+				displayName: 'Binary Property Name',
+				name: 'binaryPropertyName',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: [
+							'uploadFile',
+						],
+					},
+				},
+				default: 'data',
+				required: true,
+				description: 'Name of the binary property in which the file can be found',
+			},
 			// ----------------------------------
 			//         Pagination behavior
 			// ----------------------------------
