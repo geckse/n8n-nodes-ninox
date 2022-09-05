@@ -3,8 +3,8 @@ import {
 	INodeTypeDescription
 } from 'n8n-workflow';
 
-import { updateRecordsOptions } from './actions/updateRecords';
 import { createRecordsOptions } from './actions/createRecords';
+import { updateRecordsOptions } from './actions/updateRecords';
 import { uploadFileOptions } from './actions/uploadFile';
 import { handleIncommingFile } from './actions/handleIncommingFile';
 
@@ -152,10 +152,10 @@ export class Ninox implements INodeType {
 						},
 					},
 					{
-						name: 'Get Attached File',
+						name: 'Download Attached File',
 						value: 'getFile',
-						action: 'Get an attached file from a record by the file name',
-						description: 'Get an attached file from a record by the file name',
+						action: 'Download attached file from a record by the file name',
+						description: 'Download an attached file from a record by the file name',
 						routing: {
 							request: {
 								method: 'GET',	
@@ -169,7 +169,7 @@ export class Ninox implements INodeType {
 						},						
 					},
 					{
-						name: 'Upload a File to a Record',
+						name: 'Upload File Attachment',
 						value: 'uploadFile',
 						action: 'Add a file to a record',
 						description: 'Add a file to a record',

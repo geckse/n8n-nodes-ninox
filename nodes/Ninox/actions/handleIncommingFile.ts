@@ -1,10 +1,7 @@
 import { 
-    IBinaryKeyData,
 	IExecuteSingleFunctions,
-	IHttpRequestOptions,
     INodeExecutionData,
     IN8nHttpFullResponse,
-	JsonObject,
 	NodeOperationError
 } from 'n8n-workflow';
 
@@ -20,7 +17,7 @@ export const handleIncommingFile = async function (
             if (response.headers['content-type']) {
                 mimeType = response.headers['content-type'] as string;
             }
-            console.log(items[i].binary);
+
             const newItem: INodeExecutionData = {
                 json: {},
                 binary: {},

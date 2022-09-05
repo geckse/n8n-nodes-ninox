@@ -7,24 +7,6 @@ import {
 
 import FormData from 'form-data';
 
-function getFileName(
-    itemIndex: number,
-    mimeType: string,
-    fileExt: string,
-    fileName: string,
-): string {
-    let ext = fileExt;
-    if (fileExt === undefined) {
-        ext = mimeType.split('/')[1];
-    }
-
-    let name = `${fileName}.${ext}`;
-    if (fileName === undefined) {
-        name = `file-${itemIndex}.${ext}`;
-    }
-    return name;
-}
-
 export const uploadFileOptions = async function (
     this: IExecuteSingleFunctions,
     requestOptions: IHttpRequestOptions,
