@@ -124,10 +124,10 @@ export class NinoxTrigger implements INodeType {
 
 		const endpoint = `teams/${team}/databases/${base}/tables/${table}/records`;
 
-		var lastSequence = (webhookData.lastSequence as number) || 0;
+		let lastSequence = (webhookData.lastSequence as number) || 0;
 
 		// this is the initial request, so get the last sequence number and do not run the trigger for all records ever created
-		if(lastSequence == 0) {
+		if(lastSequence === 0) {
 			const initialRecord = await apiRequest.call(this, 'GET', endpoint, {}, { updated: true, perPage: 1 });
 			if(initialRecord.length > 0) {
 				lastSequence = initialRecord[0].sequence;
@@ -138,7 +138,7 @@ export class NinoxTrigger implements INodeType {
 		qs.updated = true;
 		qs.sinceSq = lastSequence;
 
-		var records = [];
+		let records = [];
 		if (this.getMode() === 'manual') {
 			delete qs.sinceSq;
 			qs.updated = true;

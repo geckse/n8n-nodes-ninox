@@ -7,7 +7,7 @@ import {
 
 export class NinoxApi implements ICredentialType {
 	name = 'ninoxApi';
-	displayName = 'Ninox API Credentials';
+	displayName = 'Ninox API Credentials API';
 	documentationUrl = 'https://docs.ninox.com/en/api/introduction#obtaining-a-personal-access-token';
 	properties: INodeProperties[] = [
 		{
@@ -15,7 +15,7 @@ export class NinoxApi implements ICredentialType {
 			name: 'token',
 			type: 'string',
 			default: '',
-		}
+		},
 	];
 
 	authenticate = {
