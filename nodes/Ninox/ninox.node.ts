@@ -180,20 +180,10 @@ export class Ninox implements INodeType {
 						description: 'Get attachments from a record by file name',
 						routing: {
 							request: {
-								method: 'GET',								
+								method: 'GET',	
+								returnFullResponse: true,
+								encoding: 'arraybuffer',						
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files/{{$parameter.fileName}}',
-							},
-							send: {
-								preSend: [
-									async function(
-									this: IExecuteSingleFunctions,
-									requestOptions: IHttpRequestOptions,
-								): Promise<IHttpRequestOptions> {
-									requestOptions.encoding = 'arraybuffer';
-									requestOptions.returnFullResponse = true;
-									return requestOptions;
-								}
-								],
 							},
 							output: {
 								postReceive: [handleIncommingFile],
@@ -208,12 +198,17 @@ export class Ninox implements INodeType {
 						routing: {
 							request: {
 								method: 'POST',
+								headers: {
+									'Content-Type': 'multipart/form-data',
+									'Accept': 'application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, */*;q=0.1',
+								},
+								baseURL: 'https://dev.geckse.de/formdata/',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
 							},
 							send: {
 								paginate: false,
 								preSend: [uploadFileOptions],
-								type: 'body'
+								type: 'body',
 							},
 							output: {
 								postReceive: [

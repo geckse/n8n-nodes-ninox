@@ -5,7 +5,7 @@ import {
 	NodeOperationError
 } from 'n8n-workflow';
 
-var FormData = require('form-data');
+import FormData from 'form-data';
 
 function getFileName(
     itemIndex: number,
@@ -35,12 +35,12 @@ export const uploadFileOptions = async function (
     const { body } = requestOptions;
     
     if(requestOptions.headers === undefined) requestOptions.headers = {};
-    requestOptions.headers['Content-Type'] = 'multipart/form-data';
-    requestOptions.headers['Accept'] = 'application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, */*;q=0.1';
+    //requestOptions.headers['Content-Type'] = 'multipart/form-data';
+    //requestOptions.headers['Accept'] = 'application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, */*;q=0.1';
     
-    requestOptions.encoding = null;
-    requestOptions.json = false;
-    requestOptions.bodyContentType = 'multipart/form-data';
+    //requestOptions.encoding = null;
+    //requestOptions.json = false;
+    //requestOptions.bodyContentType = 'multipart/form-data'; */
     /*requestOptions.returnFullResponse = true;*/
     /*requestOptions.encoding = 'document';
     requestOptions.method = 'POST';
@@ -57,61 +57,24 @@ export const uploadFileOptions = async function (
                 );
             }
 
-            const binaryData = item.binary![binaryPropertyName] as IBinaryData;
-            const dataBuffer = await this.helpers.getBinaryDataBuffer(binaryPropertyName) as Buffer;
 
-           /* let formData = {
-                filename: {
-                    value: dataBuffer,
-                    options: {
-                        filename: binaryData.fileName,
-                        contentType: binaryData.mimeType,
-                    },
-                }/*,
-                json: JSON.stringify({
-                    fieldId
-                    fieldName
-                }),
-            };*/
-
-            let formData = {
-                file: dataBuffer
-            };
-    
-        
-        let data = new FormData();
-        data.append('file', dataBuffer);
-
-        
-        // @ts-ignore
-        const binaryProperty = item.binary[binaryPropertyName] as IBinaryData;
+        const binaryProperty = item.binary![binaryPropertyName] as IBinaryData;
         const binaryDataBuffer = await this.helpers.getBinaryDataBuffer(
             binaryPropertyName
         );
 
-       /* {
-            “filename”: {
-            “value”: databuffer,
-            “options”: {
-            “filename”: “Haribo.png”
-            }
-            }, “fieldId”: “M1”
-            } */
+        /*requestOptions.body.formData = {};
+        requestOptions.body.formData.file = {
+            //@ts-ignore
+            value: binaryDataBuffer,
+            options: {
+                //@ts-ignore
+                filename: binaryProperty.fileName,
+                //@ts-ignore
+                contentType: binaryProperty.mimeType,
+            },
+        }; */
 
-        requestOptions.body = {
-            filename: {
-                value: null,
-                options: {
-                    filename: binaryProperty.fileName,
-                },
-            }
-        };
-            //Object.assign(body!, formData );
-
-        requestOptions.formData = requestOptions.body;
-        requestOptions.body;
-
-        console.log(requestOptions);
 
         return requestOptions;
     } catch (err) {
