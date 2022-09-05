@@ -63,5 +63,7 @@ This node communicates with the [Ninox REST API](https://docs.ninox.com/de/altes
 
 ## About
 
-Hi I'm geckse and I [let your work flow](https://let-the-work-flow.com)! 👋 
-I hope you are enyoing these nodes. If you are in need of a smooth automation, steady integration or custom code check my consulting page: https://let-the-work-flow.com
+<img src="https://let-the-work-flow.com/content/uploads/logo-let-the-work-flow-signet-quad-150x150.png" align="left" height="74" width="74"> 
+<br>
+Hi I'm geckse and I let your work flow! 👋 
+I hope you are enyoing these nodes. If you are in need of a smooth automation, steady integration or custom code check my page: https://let-the-work-flow.com
