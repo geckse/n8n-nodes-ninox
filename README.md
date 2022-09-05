@@ -32,13 +32,18 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 Since the nodes communicate with the Ninox REST API you'll have to obtain an Ninox API Key and add it as Ninox API Credential in n8n.io.
 
-Follow these steps:
-1. Goto your [Ninox](https://app.ninox.com/).
-2. Click the __cog__ icon in top right corner of your screen.
-3. Click __integrations__ in the presented menu.
-4. Copy Key and create new Ninox API Credentials in your n8n.io instance.
+Follow these steps as you can find in the [api docs of Ninox](https://docs.ninox.com/en/api/introduction#obtaining-a-personal-access-token):
+1. Visit ninox.com. 
+2. Click the Start Ninox button to open the web app. 
+3. If you don't see the Start Ninox button, log in with your Ninox credentials first.
+4. In the top-right corner, click the Actions gear icon.
+5. In the drop-down menu, select Integrations.
+6. In the pop-up window, click the Generate button.
+7. Copy the API key to your clipboard.
+8. Create a new Ninox API Credential in your n8n instance
+9. Add the API key.
 
-**Keep in mind: This API-Key provides access to all your Ninox-Teams and all the Ninox Databases of these teams. You should handle this keys with care.**
+**Keep in mind: This API ley provides access to all your Ninox teams and all the Ninox databases of these teams. You should handle this key with care.**
 
 ## Compatibility
 
