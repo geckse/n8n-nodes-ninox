@@ -1,16 +1,18 @@
-import { IExecuteFunctions } from 'n8n-core';
-
 import { 
 	INodeType, 
 	INodeTypeDescription, 
-	INodeExecutionData,
 	IExecuteSingleFunctions, 
 	IHttpRequestOptions, 
 	IDataObject, 
 	NodeOperationError, 
-	IHttpRequestMethods} from 'n8n-workflow';
+	IHttpRequestMethods,
+    INodeExecutionData,
+    IN8nHttpFullResponse} from 'n8n-workflow';
 
-import { apiRequest, apiRequestAllItems } from './transport';
+import { updateRecordsOptions } from './actions/updateRecords';
+import { appendRecordsOptions } from './actions/appendRecords';
+import { uploadFileOptions } from './actions/uploadFile';
+import { handleIncommingFile } from './actions/handleIncommingFile';
 
 export class Ninox implements INodeType {
 	description: INodeTypeDescription = {
@@ -99,49 +101,7 @@ export class Ninox implements INodeType {
 							},
 							send: {
 								paginate: false,
-								preSend: [
-									async function (
-										this: IExecuteSingleFunctions,
-										requestOptions: IHttpRequestOptions,
-									): Promise<IHttpRequestOptions> {
-										let item = this.getInputData() as any;
-										let recordId = this.getNodeParameter('recordId');
-										let addAllFields = this.getNodeParameter('addAllFields');
-										let fields = Array<string>();
-										if(!addAllFields){
-											fields = this.getNodeParameter('fields') as string[];
-										}										
-										let bodyData = {} as any;
-
-										// sending complete record, or just the fields?
-										if(item.json.id && item.json.fields){
-											bodyData = item.json;
-										} else { 
-											bodyData = {
-												id: recordId,
-												fields: item.json
-											};
-										}
-
-										// remove fields that should not be sent
-										if(!addAllFields && bodyData.fields){
-											let cleanedFields = {} as any;
-											for(let field of fields){
-												cleanedFields[field] = bodyData.fields[field];
-											}
-											bodyData.fields = cleanedFields;
-										}
-
-										if(bodyData.id != recordId){
-											throw new Error('The Record ID does not match the provided recordId. Consider using an expression to dynamical update multiple records.');
-										}
-
-										// and add it
-										requestOptions.body = bodyData;
-
-										return requestOptions;
-									},
-								],
+								preSend: [updateRecordsOptions],
 								type: 'body'
 							}
 						},
@@ -158,39 +118,7 @@ export class Ninox implements INodeType {
 							},
 							send: {
 								paginate: false,
-								preSend: [
-									async function (
-										this: IExecuteSingleFunctions,
-										requestOptions: IHttpRequestOptions,
-									): Promise<IHttpRequestOptions> {
-										let item = this.getInputData() as any;
-										let addAllFields = this.getNodeParameter('addAllFields');
-										let fields = Array<string>();
-										if(!addAllFields){
-											fields = this.getNodeParameter('fields') as string[];
-										}
-										let bodyData = {} as any;
-										// ensure it will be added, even if ids are provided
-										// otherwise it will just update the existing record by ids
-										if(item.json.id) delete item.json.id;
-
-										bodyData = item.json;
-
-										// remove fields that should not be sent
-										if(!addAllFields && bodyData.fields){
-											let cleanedFields = {} as any;
-											for(let field of fields){
-												cleanedFields[field] = bodyData.fields[field];
-											}
-											bodyData.fields = cleanedFields;
-										}
-
-										// and add it
-										requestOptions.body = bodyData;
-
-										return requestOptions;
-									},
-								],
+								preSend: [appendRecordsOptions],
 								type: 'body'
 							}
 						},
@@ -244,6 +172,63 @@ export class Ninox implements INodeType {
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
 							}
 						},
+					},
+					{
+						name: 'Get Attached File',
+						value: 'getFile',
+						action: 'Get an attached files from a record by the file name',
+						description: 'Get attachments from a record by file name',
+						routing: {
+							request: {
+								method: 'GET',								
+								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files/{{$parameter.fileName}}',
+							},
+							send: {
+								preSend: [
+									async function(
+									this: IExecuteSingleFunctions,
+									requestOptions: IHttpRequestOptions,
+								): Promise<IHttpRequestOptions> {
+									requestOptions.encoding = 'arraybuffer';
+									requestOptions.returnFullResponse = true;
+									return requestOptions;
+								}
+								],
+							},
+							output: {
+								postReceive: [handleIncommingFile],
+							}
+						},						
+					},
+					{
+						name: 'Upload a File to a Record',
+						value: 'uploadFile',
+						action: 'Add a file to a record',
+						description: 'Add a file to a record',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
+							},
+							send: {
+								paginate: false,
+								preSend: [uploadFileOptions],
+								type: 'body'
+							},
+							output: {
+								postReceive: [
+									async function (
+										this: IExecuteSingleFunctions,
+										items: INodeExecutionData[],
+										response: IN8nHttpFullResponse
+									): Promise<INodeExecutionData[]> {
+										console.log("yooo");
+										console.log(response);
+										return items;
+									}
+								],
+							}
+						},	
 					},
 					{
 						name: 'Delete Attached File',
@@ -420,6 +405,7 @@ export class Ninox implements INodeType {
 						operation: [
 							'listFiles',
 							'getFile',
+							'uploadFile'
 						],
 					},
 				},
@@ -442,7 +428,21 @@ export class Ninox implements INodeType {
 				required: true,
 				description: 'the file id.',
 			},
-
+			{
+				displayName: 'Binary Property Name',
+				name: 'binaryPropertyName',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: [
+							'uploadFile',
+						],
+					},
+				},
+				default: 'data',
+				required: true,
+				description: 'Name of the binary property in which the file can be found',
+			},
 			// ----------------------------------
 			//         Pagination behavior
 			// ----------------------------------
