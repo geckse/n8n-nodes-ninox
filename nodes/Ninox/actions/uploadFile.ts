@@ -34,18 +34,6 @@ export const uploadFileOptions = async function (
     ) as string;
     const { body } = requestOptions;
     
-    if(requestOptions.headers === undefined) requestOptions.headers = {};
-    //requestOptions.headers['Content-Type'] = 'multipart/form-data';
-    //requestOptions.headers['Accept'] = 'application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, */*;q=0.1';
-    
-    //requestOptions.encoding = null;
-    //requestOptions.json = false;
-    //requestOptions.bodyContentType = 'multipart/form-data'; */
-    /*requestOptions.returnFullResponse = true;*/
-    /*requestOptions.encoding = 'document';
-    requestOptions.method = 'POST';
-    requestOptions.json = false;
- */
     try {
 
             const item = this.getInputData();
@@ -63,18 +51,14 @@ export const uploadFileOptions = async function (
             binaryPropertyName
         );
 
-        /*requestOptions.body.formData = {};
-        requestOptions.body.formData.file = {
-            //@ts-ignore
-            value: binaryDataBuffer,
-            options: {
-                //@ts-ignore
-                filename: binaryProperty.fileName,
-                //@ts-ignore
-                contentType: binaryProperty.mimeType,
-            },
-        }; */
+        let formData = new FormData();
+        formData.append('file', binaryDataBuffer, binaryProperty.fileName);
+        requestOptions.body = formData;
 
+        requestOptions.headers = {
+            ...requestOptions.headers,
+            ...formData.getHeaders(),
+        };
 
         return requestOptions;
     } catch (err) {

@@ -1,13 +1,7 @@
 import { 
 	INodeType, 
-	INodeTypeDescription, 
-	IExecuteSingleFunctions, 
-	IHttpRequestOptions, 
-	IDataObject, 
-	NodeOperationError, 
-	IHttpRequestMethods,
-    INodeExecutionData,
-    IN8nHttpFullResponse} from 'n8n-workflow';
+	INodeTypeDescription
+} from 'n8n-workflow';
 
 import { updateRecordsOptions } from './actions/updateRecords';
 import { appendRecordsOptions } from './actions/appendRecords';
@@ -198,11 +192,6 @@ export class Ninox implements INodeType {
 						routing: {
 							request: {
 								method: 'POST',
-								headers: {
-									'Content-Type': 'multipart/form-data',
-									'Accept': 'application/json,text/html,application/xhtml+xml,application/xml,text/*;q=0.9, */*;q=0.1',
-								},
-								baseURL: 'https://dev.geckse.de/formdata/',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
 							},
 							send: {
@@ -212,17 +201,14 @@ export class Ninox implements INodeType {
 							},
 							output: {
 								postReceive: [
-									async function (
-										this: IExecuteSingleFunctions,
-										items: INodeExecutionData[],
-										response: IN8nHttpFullResponse
-									): Promise<INodeExecutionData[]> {
-										console.log("yooo");
-										console.log(response);
-										return items;
-									}
+									{
+										type: 'set',
+										properties: {
+											value: '={{ { "success": true } }}',
+										},
+									},
 								],
-							}
+							},
 						},	
 					},
 					{
