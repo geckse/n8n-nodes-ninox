@@ -4,7 +4,7 @@ import {
 } from 'n8n-workflow';
 
 import { updateRecordsOptions } from './actions/updateRecords';
-import { appendRecordsOptions } from './actions/appendRecords';
+import { createRecordsOptions } from './actions/createRecords';
 import { uploadFileOptions } from './actions/uploadFile';
 import { handleIncommingFile } from './actions/handleIncommingFile';
 
@@ -84,6 +84,23 @@ export class Ninox implements INodeType {
 						},
 					},
 					{
+						name: 'Create',
+						value: 'create',
+						description: 'Create new records in a table',
+						action: 'Create new records in a table',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
+							},
+							send: {
+								paginate: false,
+								preSend: [createRecordsOptions],
+								type: 'body'
+							}
+						},
+					},
+					{
 						name: 'Update',
 						value: 'update',
 						description: 'Update the data of a record in a table',
@@ -96,39 +113,6 @@ export class Ninox implements INodeType {
 							send: {
 								paginate: false,
 								preSend: [updateRecordsOptions],
-								type: 'body'
-							}
-						},
-					},
-					{
-						name: 'Append',
-						value: 'append',
-						description: 'Add multiple items to a table',
-						action: 'Add multiple items to a table',
-						routing: {
-							request: {
-								method: 'POST',
-								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
-							},
-							send: {
-								paginate: false,
-								preSend: [appendRecordsOptions],
-								type: 'body'
-							}
-						},
-					},
-					{
-						name: 'Ninox Script',
-						value: 'ninoxScript',
-						description: 'Send and run a Ninox Script to query data or run actions on your Ninox database',
-						action: 'Send a Ninox Script to your database',
-						routing: {
-							request: {
-								method: 'POST',
-								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/query',
-							},
-							send: {
-								paginate: false,
 								type: 'body'
 							}
 						},
@@ -170,8 +154,8 @@ export class Ninox implements INodeType {
 					{
 						name: 'Get Attached File',
 						value: 'getFile',
-						action: 'Get an attached files from a record by the file name',
-						description: 'Get attachments from a record by file name',
+						action: 'Get an attached file from a record by the file name',
+						description: 'Get an attached file from a record by the file name',
 						routing: {
 							request: {
 								method: 'GET',	
@@ -231,6 +215,22 @@ export class Ninox implements INodeType {
 									},
 								],
 							},
+						},
+					},
+					{
+						name: 'Ninox Script',
+						value: 'ninoxScript',
+						description: 'Send and run a Ninox Script to query data or run actions on your Ninox database',
+						action: 'Send a Ninox Script to your database',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/query',
+							},
+							send: {
+								paginate: false,
+								type: 'body'
+							}
 						},
 					},
 				],
@@ -507,7 +507,7 @@ export class Ninox implements INodeType {
 				displayOptions: {
 					show: {
 						operation: [
-							'append',
+							'create',
 							'update'
 						],
 					},
@@ -529,7 +529,7 @@ export class Ninox implements INodeType {
 							false,
 						],
 						operation: [
-							'append',
+							'create',
 							'update'
 						],
 					},

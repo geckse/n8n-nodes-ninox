@@ -3,7 +3,7 @@ import {
 	IHttpRequestOptions
 } from 'n8n-workflow';
 
-export const appendRecordsOptions = async function (
+export const createRecordsOptions = async function (
     this: IExecuteSingleFunctions,
     requestOptions: IHttpRequestOptions,
 ): Promise<IHttpRequestOptions> {
