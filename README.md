@@ -2,7 +2,7 @@
 
 # Ninox Nodes for n8n.io
 
-This community package contains two nodes to integrate your (Ninox)[https://ninox.com] Database with n8n.io.
+This community package contains two nodes to integrate your [Ninox](https://ninox.com) Database with n8n.io.
 It adds two nodes:
 
 | Ninox Node  | Ninox Trigger Node |
@@ -60,3 +60,8 @@ Currently the Create and Update operation run a request to the Ninox API for eac
 ## Integration Approach
 
 This node communicates with the [Ninox REST API](https://docs.ninox.com/de/altes-handbuch/ninox-api/ninox-rest-api). The CRUD Operations are simple REST-API calls. For the Trigger Node I choosed to work with the sequence id. Everytime a change is made or a record is created the sequence number in your ninox table will be incremented by one. That made it pretty easy to get the difference between two sequences.
+
+## About
+
+Hi I'm geckse and I [let your work flow](https://let-the-work-flow.com)! 👋 
+I hope you are enyoing these nodes. If you are in need of a smooth automation, steady integration or custom code check my consulting page: https://let-the-work-flow.com
