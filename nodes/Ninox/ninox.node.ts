@@ -58,6 +58,7 @@ export class Ninox implements INodeType {
 				name: 'operation',
 				type: 'options',
 				noDataExpression: true,
+				// eslint-disable-next-line n8n-nodes-base/node-param-options-type-unsorted-items
 				options: [
 					{
 						name: 'List',
@@ -68,7 +69,7 @@ export class Ninox implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
-							}
+							},
 						},
 					},				
 					{
@@ -80,7 +81,7 @@ export class Ninox implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}',
-							}
+							},
 						},
 					},
 					{
@@ -96,8 +97,8 @@ export class Ninox implements INodeType {
 							send: {
 								paginate: false,
 								preSend: [createRecordsOptions],
-								type: 'body'
-							}
+								type: 'body',
+							},
 						},
 					},
 					{
@@ -113,8 +114,8 @@ export class Ninox implements INodeType {
 							send: {
 								paginate: false,
 								preSend: [updateRecordsOptions],
-								type: 'body'
-							}
+								type: 'body',
+							},
 						},
 					},
 					{
@@ -148,7 +149,7 @@ export class Ninox implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
-							}
+							},
 						},
 					},
 					{
@@ -165,7 +166,7 @@ export class Ninox implements INodeType {
 							},
 							output: {
 								postReceive: [handleIncommingFile],
-							}
+							},
 						},						
 					},
 					{
@@ -221,7 +222,7 @@ export class Ninox implements INodeType {
 						name: 'Ninox Script',
 						value: 'ninoxScript',
 						description: 'Send and run a Ninox Script to query data or run actions on your Ninox database',
-						action: 'Send a Ninox Script to your database',
+						action: 'Send a ninox script to your database',
 						routing: {
 							request: {
 								method: 'POST',
@@ -229,8 +230,8 @@ export class Ninox implements INodeType {
 							},
 							send: {
 								paginate: false,
-								type: 'body'
-							}
+								type: 'body',
+							},
 						},
 					},
 				],
@@ -293,8 +294,8 @@ export class Ninox implements INodeType {
 					hide: {
 						operation: [
 							'ninoxScript',
-						]
-					}
+						],
+					},
 				},
 				description: 'The ID of the table to access',
 			},
@@ -313,8 +314,8 @@ export class Ninox implements INodeType {
 					show: {
 						operation: [
 							'ninoxScript',
-						]
-					}
+						],
+					},
 				},
 				routing: {
 					send: {
@@ -322,7 +323,7 @@ export class Ninox implements INodeType {
 						property: 'query',
 					},
 				},
-				description: 'Use an Ninox Script to build your own query.',
+				description: 'Use an Ninox Script to build your own query',
 			},
 			// ----------------------------------
 			//         Record ID Behavior
@@ -340,7 +341,7 @@ export class Ninox implements INodeType {
 				},
 				default: '',
 				required: true,
-				description: 'Id of the record to return.',
+				description: 'ID of the record to return',
 			},
 			{
 				displayName: 'Record ID',
@@ -370,7 +371,7 @@ export class Ninox implements INodeType {
 				},
 				default: '',
 				required: true,
-				description: 'Delete a record.',
+				description: 'Delete a record',
 			},
 
 			// ----------------------------------
@@ -386,13 +387,13 @@ export class Ninox implements INodeType {
 						operation: [
 							'listFiles',
 							'getFile',
-							'uploadFile'
+							'uploadFile',
 						],
 					},
 				},
 				default: '',
 				required: true,
-				description: 'Id of the record with the attachments.',
+				description: 'ID of the record with the attachments',
 			},
 			{
 				displayName: 'File Name',
@@ -407,7 +408,7 @@ export class Ninox implements INodeType {
 				},
 				default: '',
 				required: true,
-				description: 'the file id.',
+				description: 'The file ID',
 			},
 			{
 				displayName: 'Binary Property Name',
@@ -448,7 +449,7 @@ export class Ninox implements INodeType {
 								type: 'query',
 							},
 						},
-					}
+					},
 				},
 				description: 'Whether to return all results or only up to a given limit',
 			},
@@ -493,7 +494,7 @@ export class Ninox implements INodeType {
 						property: 'perPage',
 					},
 				},
-				default: 100,
+				default: 50,
 				description: 'Max number of results to return',
 			},
 
@@ -508,12 +509,12 @@ export class Ninox implements INodeType {
 					show: {
 						operation: [
 							'create',
-							'update'
+							'update',
 						],
 					},
 				},
 				default: true,
-				description: 'If all fields should be sent to Ninox or only specific ones.',
+				description: 'Whether to send all fields to Ninox or only specific ones',
 			},
 			{
 				displayName: 'Fields',
@@ -530,14 +531,14 @@ export class Ninox implements INodeType {
 						],
 						operation: [
 							'create',
-							'update'
+							'update',
 						],
 					},
 				},
 				default: [],
 				placeholder: 'Name',
 				required: true,
-				description: 'The name of fields for which data should be sent to Ninox.',
+				description: 'The name of fields for which data should be sent to Ninox',
 			},
 			// ----------------------------------
 			//         Additional Optios 
@@ -556,7 +557,7 @@ export class Ninox implements INodeType {
 				placeholder: 'Add Option',
 				options: [
 					{
-						displayName: 'Sort by field',
+						displayName: 'Sort by Field',
 						name: 'sort',
 						placeholder: 'Add Sort Rule',
 						description: 'Defines how the returned records should be ordered',
@@ -591,7 +592,7 @@ export class Ninox implements INodeType {
 												type: 'query',
 												property: 'order',
 											},
-										}
+										},
 									},
 									{
 										displayName: 'Direction',
@@ -631,9 +632,9 @@ export class Ninox implements INodeType {
 						],
 					},
 					{
-						displayName: 'Sort by latest modified',
+						displayName: 'Sort by Latest Modified',
 						name: 'sortUpdate',
-						description: 'Show last changed records first (not combinable with order)',
+						description: 'Whether to show last changed records first (not combinable with order)',
 						type: 'boolean',
 						routing: {
 							send: {
@@ -645,19 +646,19 @@ export class Ninox implements INodeType {
 						displayOptions: {
 							hide: {
 								sort: [
-									true
+									true,
 								],
 								sortNew: [
-									true
+									true,
 								],
 							},
 						},
 						default: true,
 					},
 					{
-						displayName: 'Sort by latest created',
+						displayName: 'Sort by Latest Created',
 						name: 'sortNew',
-						description: 'Show newest records first (not combinable with order)',
+						description: 'Whether to show newest records first (not combinable with order)',
 						type: 'boolean',
 						routing: {
 							send: {
@@ -672,7 +673,7 @@ export class Ninox implements INodeType {
 									true,
 								],
 								sortUpdate: [
-									true
+									true,
 								],
 							},
 						},
@@ -687,7 +688,7 @@ export class Ninox implements INodeType {
 						routing: {
 							send: {
 								type: 'query',
-								property: 'filters'
+								property: 'filters',
 							},
 						},
 						default: '',
@@ -700,7 +701,7 @@ export class Ninox implements INodeType {
 						routing: {
 							send: {
 								type: 'query',
-								property: 'sinceId'
+								property: 'sinceId',
 							},
 						},
 						default: '',
@@ -713,7 +714,7 @@ export class Ninox implements INodeType {
 						routing: {
 							send: {
 								type: 'query',
-								property: 'sinceSq'
+								property: 'sinceSq',
 							},
 						},
 						default: '',
