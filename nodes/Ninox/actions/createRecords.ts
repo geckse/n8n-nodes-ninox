@@ -20,7 +20,14 @@ export const createRecordsOptions = async function (
 		// otherwise it will just update the existing record by ids
 		if(item.json.id) delete item.json.id;
 
-		bodyData = item.json;
+		// sending complete record, or just the fields?
+		if (item.json.fields) {
+			bodyData = item.json;
+		} else {
+			bodyData = {
+				fields: item.json,
+			};
+		}
 
 		// remove fields that should not be sent
 		if(!addAllFields && bodyData.fields){
