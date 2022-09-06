@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-ninox",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "This package contains two nodes for n8n which can be used to interact with Ninox.",
   "keywords": [
     "n8n-community-node-package",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/geckse/n8n-ninox-node.git"
+    "url": "https://github.com/geckse/n8n-nodes-ninox.git"
   },
   "main": "index.js",
   "scripts": {

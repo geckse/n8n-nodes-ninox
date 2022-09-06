@@ -3,11 +3,23 @@
 # Ninox Nodes for n8n.io
 
 This community package contains two nodes to integrate your [Ninox](https://ninox.com) Database with n8n.io.
+
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
+
 It adds two nodes:
 
 | Ninox Node  | Ninox Trigger Node |
 | ------------- | ------------- |
 | Operations: List, read, create, update delete Records and files and run Ninox Scripts  | Events: on create or change of records via polling |
+
+[Supported Operations](#supported-operations)  
+[Installation](#installation)  
+[Credentials](#credentials)
+[Compatibility](#compatibility)  
+[Notes for an improvement](#Notes-for-an-improvement) 
+[Resources](#resources)  
+[Integration Approach](#integration-approach)  
+[About](#about)  
 
 ## Supported Operations
 
