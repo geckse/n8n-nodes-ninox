@@ -1,8 +1,8 @@
 <img src="https://raw.githubusercontent.com/geckse/n8n-nodes-ninox/master/nodes/Ninox/ninox.svg" align="left" height="74" width="74"> 
 
-# Ninox Nodes for n8n.io
+# Ninox Nodes for n8n
 
-This community package contains two nodes to integrate your [Ninox](https://ninox.com) Database with n8n.io.
+This community package contains two nodes to integrate your [Ninox](https://ninox.com) Database with [n8n](https://n8n.io/).
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -14,12 +14,13 @@ It adds two nodes:
 
 [Supported Operations](#supported-operations)  
 [Installation](#installation)  
-[Credentials](#credentials)
+[Credentials](#credentials)  
 [Compatibility](#compatibility)  
-[Notes for an improvement](#Notes-for-an-improvement) 
+[Notes for an improvement](#Notes-for-an-improvement)  
 [Resources](#resources)  
 [Integration Approach](#integration-approach)  
 [About](#about)  
+[Version History](#version-history)  
 
 ## Supported Operations
 
@@ -32,7 +33,7 @@ It adds two nodes:
 | Delete  | Delete a record in a table by ID | - |
 | List Attached Files  | Get the attached files of a record by ID | - |
 | Download Attached File | Get the actual file of attached file by file name | - |
-| Upload File Attachment | Upload a new file to record | - |
+| Upload File Attachment | Upload a new file to record | optional: add an Attachment Field ID or Name. When defined, the file will be uploaded into the field |
 | Delete Attached File | Remove a attached file from record by file name | - |
 | Ninox Script | Send and run a Ninox Script to query data or run actions on your Ninox database | - |
 
@@ -57,6 +58,12 @@ Follow these steps as you can find in the [api docs of Ninox](https://docs.ninox
 
 **Keep in mind: This API ley provides access to all your Ninox teams and all the Ninox databases of these teams. You should handle this key with care.**
 
+### Credentials for Ninox Private Cloud & Ninox On-Premise
+
+Basicly the same steps as for Public Cloud users. 
+You just need to define a Custom URL in the n8n credentials for Ninox.
+You're URL will be something like ```https://mycompany.ninox.com/v1``` for Private Cloud users and ```https://myninox.mydomain.com/v1``` for On-Premise users.
+
 ## Compatibility
 
 The Latest Version of n8n. If you encounter any problem, feel free to [open an issue](https://github.com/geckse/n8n-nodes-ninox) on Github. 
@@ -79,3 +86,9 @@ This node communicates with the [Ninox REST API](https://docs.ninox.com/de/altes
 <br>
 Hi I'm geckse and I let your work flow! 👋 
 I hope you are enyoing these nodes. If you are in need of a smooth automation, steady integration or custom code check my page: https://let-the-work-flow.com
+
+## Version History
+
+### 1.1.0
+- Upload File Attachment: new optional option "Attachment Field"
+- Credentials: added custom base url for Ninox on-prem & private cloud users
