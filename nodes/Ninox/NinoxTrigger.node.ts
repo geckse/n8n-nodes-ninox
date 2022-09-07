@@ -33,7 +33,7 @@ export class NinoxTrigger implements INodeType {
 			},
 		],
 		requestDefaults: {
-			baseURL: '={{ !$credentials.customBaseUrl ? "https://api.ninoxdb.com/v1" : $credentials.baseUrl}}',
+			baseURL: '={{ !$credentials.customBaseUrl ? "https://api.ninox.com/v1" : $credentials.baseUrl.replace(new RegExp("/$"), "") }}',
 			url: '',
 			headers: {
 				Accept: 'application/json',

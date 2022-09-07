@@ -1,7 +1,7 @@
 import { IExecuteFunctions, IHookFunctions, ILoadOptionsFunctions } from 'n8n-core';
-
 import {
 	GenericValue,
+	ICredentialDataDecryptedObject,
 	IDataObject,
 	IHttpRequestMethods,
 	IHttpRequestOptions,
@@ -19,14 +19,15 @@ export async function apiRequest(
 	body: IDataObject | GenericValue | GenericValue[] = {},
 	query: IDataObject = {},
 ) {
-
-	const baseUrl = 'https://api.ninoxdb.de/v1/'; // TODO: Get from node or credentials
+	
+	const creds = (await this.getCredentials('ninoxApi')) as ICredentialDataDecryptedObject;
+	const baseUrl = (creds.baseUrl ? creds.baseUrl.toString().replace(/\/$/, '') : 'https://api.ninox.com/v1') as string;
 
 	const options: IHttpRequestOptions = {
 		method,
 		body,
 		qs: query,
-		url: `${baseUrl}${endpoint}`,
+		url: `${baseUrl}/${endpoint}`,
 		headers: {
 			'content-type': 'application/json; charset=utf-8',
 		},
