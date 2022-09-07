@@ -89,6 +89,9 @@ I hope you are enyoing these nodes. If you are in need of a smooth automation, s
 
 ## Version History
 
+### 1.1.1
+- Fix wrong baseURL for Credentials testing
+
 ### 1.1.0
 - Upload File Attachment: new optional option "Attachment Field"
 - Credentials: added custom base url for Ninox on-prem & private cloud users
