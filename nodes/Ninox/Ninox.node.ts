@@ -425,6 +425,20 @@ export class Ninox implements INodeType {
 				required: true,
 				description: 'Name of the binary property in which the file can be found',
 			},
+			{
+				displayName: 'Attachment Field',
+				name: 'attachmentField',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation: [
+							'uploadFile',
+						],
+					},
+				},
+				default: '',
+				description: 'Name or ID of a field where the attachment should be added. If empty, the file will be added to the records attachment.',
+			},
 			// ----------------------------------
 			//         Pagination behavior
 			// ----------------------------------

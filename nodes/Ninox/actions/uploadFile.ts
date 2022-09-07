@@ -14,6 +14,9 @@ export const uploadFileOptions = async function (
 		const binaryPropertyName = this.getNodeParameter(
 				'binaryPropertyName',
 		) as string;
+		const attachmentField = this.getNodeParameter(
+			'attachmentField',
+	) as string;
 		const { body } = requestOptions;
 		
 		try {
@@ -35,6 +38,12 @@ export const uploadFileOptions = async function (
 
 				const formData = new FormData();
 				formData.append('file', binaryDataBuffer, binaryProperty.fileName);
+				
+				if(attachmentField){
+					// works either for field names or field ids 
+					formData.append('fieldName', attachmentField);
+				}
+
 				requestOptions.body = formData;
 
 				requestOptions.headers = {
