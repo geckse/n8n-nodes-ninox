@@ -32,7 +32,7 @@ It adds two nodes:
 | Update  | Update a record in a table by ID | update all fields or define a specific subset |
 | Delete  | Delete a record in a table by ID | - |
 | List Attached Files  | Get the attached files of a record by ID | - |
-| Download Attached File | Get the actual file of attached file by file name | - |
+| Download Attached File | Get the actual binary of a attachment by file name | - |
 | Upload File Attachment | Upload a new file to record | optional: add an Attachment Field ID or Name. When defined, the file will be uploaded into the field |
 | Delete Attached File | Remove a attached file from record by file name | - |
 | Ninox Script | Send and run a Ninox Script to query data or run actions on your Ninox database | - |
@@ -62,14 +62,14 @@ Follow these steps as you can find in the [api docs of Ninox](https://docs.ninox
 
 Basicly the same steps as for Public Cloud users. 
 You just need to define a Custom URL in the n8n credentials for Ninox.
-You're URL will be something like ```https://mycompany.ninox.com/v1``` for Private Cloud users and ```https://myninox.mydomain.com/v1``` for On-Premise users.
+Your URL will be something like ```https://mycompany.ninox.com/v1``` for Private Cloud users and ```https://myninox.mydomain.com/v1``` for On-Premise users.
 
 ## Compatibility
 
 The Latest Version of n8n. If you encounter any problem, feel free to [open an issue](https://github.com/geckse/n8n-nodes-ninox) on Github. 
 
 ## Notes for an improvement
-Currently the Create and Update operation run a request to the Ninox API for each Item. It would be an optimization to batch these additions in a single request since the Ninox API supports that. But at this moment I was not able to make that request in the declarative implementation in n8n of this node. I might add this in the future. 
+Currently the Create and Update operation run a request for each Item. It would be an optimization to batch these additions in a single request since the Ninox API supports that. But at this moment I was not able to make that request in the declarative implementation in n8n of this node. I might add this in the future. 
 
 ## Resources
 
