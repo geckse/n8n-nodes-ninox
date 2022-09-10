@@ -2,11 +2,11 @@ import { IPollFunctions } from 'n8n-core';
 
 import {	
 	IDataObject,
+	ILoadOptionsFunctions,
 	INodeExecutionData,
+	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
-	ILoadOptionsFunctions,
-	INodePropertyOptions,
 	NodeOperationError
 } from 'n8n-workflow';
 
@@ -56,25 +56,25 @@ export class NinoxTrigger implements INodeType {
 		 */ 
 		properties: [
 			{
-				displayName: 'Team ID',
+				displayName: 'Team Name or ID',
 				name: 'teamId',
 				type: 'options',
 				default: '',
 				placeholder: '',
 				required: true,
-				description: 'The ID of the team to access',
+				description: 'The ID of the team to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 				typeOptions: {
 					loadOptionsMethod: 'getTeams',
 				},
 			},
 			{
-				displayName: 'Database ID',
+				displayName: 'Database Name or ID',
 				name: 'databaseId',
 				type: 'options',
 				default: '',
 				placeholder: '',
 				required: true,
-				description: 'The ID of the database to access',
+				description: 'The ID of the database to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 				displayOptions: {
 					hide: {
 						teamId: [
@@ -87,7 +87,7 @@ export class NinoxTrigger implements INodeType {
 				},
 			},
 			{
-				displayName: 'Table ID',
+				displayName: 'Table Name or ID',
 				name: 'tableId',
 				type: 'options',
 				default: '',
@@ -106,7 +106,7 @@ export class NinoxTrigger implements INodeType {
 				typeOptions: {
 					loadOptionsMethod: 'getTables',
 				},
-				description: 'The ID of the table to access',
+				description: 'The ID of the table to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 			},	
 		],
 	};
@@ -119,7 +119,7 @@ export class NinoxTrigger implements INodeType {
 					'GET',
 					'/teams',
 					{},
-					{}
+					{},
 				);
 				// @ts-ignore
 				const returnData = teams.map((o) => ({
@@ -137,7 +137,7 @@ export class NinoxTrigger implements INodeType {
 					'GET',
 					'/teams/'+teamId+'/databases',
 					{},
-					{}
+					{},
 				);
 				// @ts-ignore
 				const returnData = databases.map((o) => ({
@@ -156,7 +156,7 @@ export class NinoxTrigger implements INodeType {
 					'GET',
 					'/teams/'+teamId+'/databases/'+databaseId+'/tables',
 					{},
-					{}
+					{},
 				);
 				// @ts-ignore
 				const returnData = tables.map((o) => ({
