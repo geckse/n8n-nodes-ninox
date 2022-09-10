@@ -1,12 +1,16 @@
 import { 
 	INodeType, 
-	INodeTypeDescription
+	INodeTypeDescription,
+	ILoadOptionsFunctions,
+	INodePropertyOptions
 } from 'n8n-workflow';
 
 import { createRecordsOptions } from './actions/createRecords';
 import { updateRecordsOptions } from './actions/updateRecords';
 import { uploadFileOptions } from './actions/uploadFile';
 import { handleIncommingFile } from './actions/handleIncommingFile';
+
+import { apiRequest } from './transport';
 
 export class Ninox implements INodeType {
 	description: INodeTypeDescription = {
@@ -241,61 +245,56 @@ export class Ninox implements INodeType {
 			{
 				displayName: 'Team ID',
 				name: 'teamId',
-				type: 'string',
+				type: 'options',
 				default: '',
-				placeholder: '67mm9vc324bM7x',
+				placeholder: '',
 				required: true,
 				description: 'The ID of the team to access',
-				/*typeOptions: {
-					loadOptions: {
-						routing: {
-							request: {
-								method: 'GET',
-								url: 'teams',
-							},
-							output: {
-								postReceive: [
-								 	 {
-										type: 'setKeyValue',
-										properties: {
-											name: '={{$responseItem.name}} - ({{$responseItem.id}})',
-											value: '={{$responseItem.id}}',
-										},
-									},
-									{
-										type: 'sort',
-										properties: {
-											key: 'name',
-										},
-									}, 
-								],
-							},
-						},
-					},
-				},*/
+				typeOptions: {
+					loadOptionsMethod: 'getTeams',
+				},
 			},
 			{
 				displayName: 'Database ID',
 				name: 'databaseId',
-				type: 'string',
+				type: 'options',
 				default: '',
-				placeholder: 'nk5xt24oixj4',
+				placeholder: '',
 				required: true,
 				description: 'The ID of the database to access',
+				displayOptions: {
+					hide: {
+						teamId: [
+							'',
+						],
+					},
+				},
+				typeOptions: {
+					loadOptionsMethod: 'getDatabases',
+				},
 			},
 			{
 				displayName: 'Table ID',
 				name: 'tableId',
-				type: 'string',
+				type: 'options',
 				default: '',
-				placeholder: 'A',
+				placeholder: '',
 				required: true,
 				displayOptions: {
 					hide: {
+						teamId: [
+							'',
+						],
+						databaseId: [
+							'',
+						],
 						operation: [
 							'ninoxScript',
 						],
 					},
+				},
+				typeOptions: {
+					loadOptionsMethod: 'getTables',
 				},
 				description: 'The ID of the table to access',
 			},
@@ -738,4 +737,62 @@ export class Ninox implements INodeType {
 			},	
 		],
 	};
+
+	methods = {
+		loadOptions: {
+			async getTeams(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const teams = await apiRequest.call(
+					this,
+					'GET',
+					'/teams',
+					{},
+					{}
+				);
+				// @ts-ignore
+				const returnData = teams.map((o) => ({
+					name: o.name,
+					value: o.id,
+				})) as INodePropertyOptions[];
+				return returnData;
+			},
+			async getDatabases(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				
+				const teamId = this.getCurrentNodeParameter('teamId') as string;
+
+				const databases = await apiRequest.call(
+					this,
+					'GET',
+					'/teams/'+teamId+'/databases',
+					{},
+					{}
+				);
+				// @ts-ignore
+				const returnData = databases.map((o) => ({
+					name: o.name,
+					value: o.id,
+				})) as INodePropertyOptions[];
+				return returnData;
+			},
+			async getTables(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				
+				const teamId = this.getCurrentNodeParameter('teamId') as string;
+				const databaseId = this.getCurrentNodeParameter('databaseId') as string;
+
+				const tables = await apiRequest.call(
+					this,
+					'GET',
+					'/teams/'+teamId+'/databases/'+databaseId+'/tables',
+					{},
+					{}
+				);
+				// @ts-ignore
+				const returnData = tables.map((o) => ({
+					name: o.name,
+					value: o.id,
+				})) as INodePropertyOptions[];
+				return returnData;
+			},
+		},
+	};
+
 }
