@@ -89,6 +89,9 @@ I hope you are enyoing these nodes. If you are in need of a smooth automation, s
 
 ## Version History
 
+### 1.1.3
+- Fix missing Record ID and File Name fields in Delete File Attachment operation
+
 ### 1.1.2
 - Added dynamical loaded dropdowns for TeamID, DatabaseID & TeamID
 
