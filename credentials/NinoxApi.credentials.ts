@@ -41,14 +41,14 @@ export class NinoxApi implements ICredentialType {
 		},
 	];
 
-	authenticate = {
+	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {
 			headers: {
 				Authorization: '={{"Bearer " + $credentials.token}}',
 			},
 		},
-	} as IAuthenticateGeneric;
+	};
 
 	// The block below tells how this credential can be tested
 	test: ICredentialTestRequest = {
