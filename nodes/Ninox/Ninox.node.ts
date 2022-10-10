@@ -387,6 +387,7 @@ export class Ninox implements INodeType {
 							'listFiles',
 							'getFile',
 							'uploadFile',
+							'deleteFile',
 						],
 					},
 				},
@@ -402,6 +403,7 @@ export class Ninox implements INodeType {
 					show: {
 						operation: [
 							'getFile',
+							'deleteFile'
 						],
 					},
 				},
