@@ -7,7 +7,6 @@ import {
 	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
-	NodeOperationError
 } from 'n8n-workflow';
 
 import { apiRequest, apiRequestAllItems } from './transport';

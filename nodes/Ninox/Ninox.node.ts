@@ -1,8 +1,11 @@
-import { 
-	ILoadOptionsFunctions, 
+import {
+	ILoadOptionsFunctions,
 	INodePropertyOptions,
 	INodeType,
-	INodeTypeDescription
+	INodeTypeDescription,
+	INodeListSearchResult,
+	INodeListSearchItems,
+	INodeParameterResourceLocator
 } from 'n8n-workflow';
 
 import { createRecordsOptions } from './actions/createRecords';
@@ -52,7 +55,7 @@ export class Ninox implements INodeType {
 		 * In our example, the operations are separated into their own file (HTTPVerbDescription.ts)
 		 * to keep this class easy to read.
 		 *
-		 */ 
+		 */
 		properties: [
 			// ----------------------------------
 			//         Operations
@@ -75,7 +78,7 @@ export class Ninox implements INodeType {
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
 							},
 						},
-					},				
+					},
 					{
 						name: 'Read',
 						value: 'read',
@@ -163,15 +166,15 @@ export class Ninox implements INodeType {
 						description: 'Download an attached file from a record by the file name',
 						routing: {
 							request: {
-								method: 'GET',	
+								method: 'GET',
 								returnFullResponse: true,
-								encoding: 'arraybuffer',						
+								encoding: 'arraybuffer',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files/{{$parameter.fileName}}',
 							},
 							output: {
 								postReceive: [handleIncommingFile],
 							},
-						},						
+						},
 					},
 					{
 						name: 'Upload File Attachment',
@@ -198,7 +201,7 @@ export class Ninox implements INodeType {
 									},
 								],
 							},
-						},	
+						},
 					},
 					{
 						name: 'Delete Attached File',
@@ -241,23 +244,70 @@ export class Ninox implements INodeType {
 				],
 				default: 'list',
 			},
-
 			{
-				displayName: 'Team Name or ID',
+				displayName: 'Ninox Team',
 				name: 'teamId',
-				type: 'options',
+				type: 'resourceLocator',
 				default: '',
 				placeholder: '',
 				required: true,
 				description: 'The ID of the team to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
-				typeOptions: {
+				/*typeOptions: {
 					loadOptionsMethod: 'getTeams',
-				},
+				},*/
+				modes: [
+					{
+						displayName: 'ID',
+						name: 'id',
+						type: 'string',
+						hint: 'Enter an ID',
+						validation: [
+							{
+								type: 'regex',
+								properties: {
+									regex: '^[a-zA-Z0-9_]*$',
+									errorMessage: 'The ID must be alphanumeric',
+								},
+							},
+						],
+						placeholder: 'ub5u88eb4b13',
+						url: '=teams/{{$value}}',
+					},
+					{
+						displayName: 'URL',
+						name: 'url',
+						type: 'string',
+						hint: 'Enter a Ninox URL',
+						validation: [
+							{
+								type: 'regex',
+								properties: {
+									regex: '(?:https|http):\/\/app\.ninox\.com\/#\/teams\/[a-zA-Z0-9]{2,}.*',
+									errorMessage: 'Not a valid Ninox URL',
+								},
+							},
+						], // https://app.ninox.com/#/teams/voiNdnWLGJ6f3Y4ar/database/ub5u88eb4b13/module/A/view/GX9Xxw4LGESbswLL
+						placeholder: 'https://app.ninox.com/#/teams/voiNdnWLGJ6f3Y4ar/database/ub5u88eb4b13/module/A',
+						extractValue: {
+							type: 'regex',
+							regex: '(?:https|http):\/\/app\.ninox\.com\/#\/teams\/([a-zA-Z0-9]{2,}).*',
+						},
+					},
+					{
+						displayName: 'List',
+						name: 'list',
+						type: 'list',
+						typeOptions: {
+							searchListMethod: 'getTeams',
+							searchable: true
+						}
+					}
+				],
 			},
 			{
-				displayName: 'Database Name or ID',
+				displayName: 'Ninox Database',
 				name: 'databaseId',
-				type: 'options',
+				type: 'resourceLocator',
 				default: '',
 				placeholder: '',
 				required: true,
@@ -269,14 +319,62 @@ export class Ninox implements INodeType {
 						],
 					},
 				},
-				typeOptions: {
+				/*typeOptions: {
 					loadOptionsMethod: 'getDatabases',
-				},
+				},*/
+				modes: [
+					{
+						displayName: 'ID',
+						name: 'id',
+						type: 'string',
+						hint: 'Enter an ID',
+						validation: [
+							{
+								type: 'regex',
+								properties: {
+									regex: '^[a-zA-Z0-9_]*$',
+									errorMessage: 'The ID must be alphanumeric',
+								},
+							},
+						],
+						placeholder: 'ub5u88eb4b13',
+						url: '=teams/{{$parameter.teamId}}/databases/{{$value}}',
+					},
+					{
+						displayName: 'URL',
+						name: 'url',
+						type: 'string',
+						hint: 'Enter a Ninox URL',
+						validation: [
+							{
+								type: 'regex',
+								properties: {
+									regex: '(?:https|http)://app.ninox.com/#/teams/([a-zA-Z0-9]{2,})/databases/([a-zA-Z0-9]{2,}).*',
+									errorMessage: 'Not a valid Ninox URL',
+								},
+							},
+						],
+						placeholder: 'https://app.ninox.com/#/teams/voiNdnWLGJ6f3Y4ar/database/ub5u88eb4b13/module/A',
+						extractValue: {
+							type: 'regex',
+							regex: 'app.ninox\.com\/\#\/teams\/[a-zA-Z0-9]*.*\/databases/([a-zA-Z0-9]*.*).*',
+						},
+					},
+					{
+						displayName: 'List',
+						name: 'list',
+						type: 'list',
+						typeOptions: {
+							searchListMethod: 'getDatabases',
+							searchable: true
+						}
+					}
+				],
 			},
 			{
-				displayName: 'Table Name or ID',
+				displayName: 'Ninox Table',
 				name: 'tableId',
-				type: 'options',
+				type: 'resourceLocator',
 				default: '',
 				placeholder: '',
 				required: true,
@@ -293,15 +391,64 @@ export class Ninox implements INodeType {
 						],
 					},
 				},
+				/*
 				typeOptions: {
 					loadOptionsMethod: 'getTables',
-				},
+				},*/
+				modes: [
+					{
+						displayName: 'ID',
+						name: 'id',
+						type: 'string',
+						hint: 'Enter an ID',
+						validation: [
+							{
+								type: 'regex',
+								properties: {
+									regex: '^[a-zA-Z0-9_]*$',
+									errorMessage: 'The ID must be alphanumeric',
+								},
+							},
+						],
+						placeholder: 'A',
+						url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$value}}',
+					},
+					{
+						displayName: 'URL',
+						name: 'url',
+						type: 'string',
+						hint: 'Enter a Ninox URL',
+						validation: [
+							{
+								type: 'regex',
+								properties: {
+									regex: 'http(s)?://app.ninox.com/#/teams/([a-zA-Z0-9]{2,})/databases/([a-zA-Z0-9]{2,})/tables/([a-zA-Z0-9]{1,}).*',
+									errorMessage: 'Not a valid Ninox URL',
+								},
+							},
+						],
+						placeholder: 'https://app.ninox.com/#/teams/voiNdnWLGJ6f3Y4ar/database/ub5u88eb4b13/module/A',
+						extractValue: {
+							type: 'regex',
+							regex: 'app.ninox\.com\/\#\/teams\/[a-zA-Z0-9]*.*\/database/[a-zA-Z0-9]*.*\/module/([a-zA-Z0-9]*.*).*',
+						},
+					},
+					{
+						displayName: 'List',
+						name: 'list',
+						type: 'list',
+						typeOptions: {
+							searchListMethod: 'getTables',
+							searchable: true
+						}
+					}
+				],
 				description: 'The ID of the table to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
 			},
 			// ----------------------------------
 			//         Ninox Script
 			// ----------------------------------
-			
+
 			{
 				displayName: 'Ninox Script',
 				name: 'script',
@@ -556,7 +703,7 @@ export class Ninox implements INodeType {
 				description: 'The name of fields for which data should be sent to Ninox',
 			},
 			// ----------------------------------
-			//         Additional Optios 
+			//         Additional Options 
 			// ----------------------------------			
 			{
 				displayName: 'Additional Options',
@@ -736,7 +883,7 @@ export class Ninox implements INodeType {
 					},
 
 				],
-			},	
+			},
 		],
 	};
 
@@ -758,13 +905,13 @@ export class Ninox implements INodeType {
 				return returnData;
 			},
 			async getDatabases(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				
+
 				const teamId = this.getCurrentNodeParameter('teamId') as string;
 
 				const databases = await apiRequest.call(
 					this,
 					'GET',
-					'/teams/'+teamId+'/databases',
+					'/teams/' + teamId + '/databases',
 					{},
 					{},
 				);
@@ -776,14 +923,14 @@ export class Ninox implements INodeType {
 				return returnData;
 			},
 			async getTables(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				
+
 				const teamId = this.getCurrentNodeParameter('teamId') as string;
 				const databaseId = this.getCurrentNodeParameter('databaseId') as string;
 
 				const tables = await apiRequest.call(
 					this,
 					'GET',
-					'/teams/'+teamId+'/databases/'+databaseId+'/tables',
+					'/teams/' + teamId + '/databases/' + databaseId + '/tables',
 					{},
 					{},
 				);
@@ -794,6 +941,107 @@ export class Ninox implements INodeType {
 				})) as INodePropertyOptions[];
 				return returnData;
 			},
+		},
+		listSearch: {
+			async getTeams(
+				this: ILoadOptionsFunctions,
+				filter?: string,
+			): Promise<INodeListSearchResult> {
+				const teams = await apiRequest.call(
+					this,
+					'GET',
+					'/teams',
+					{},
+					{},
+				) as Array<{ id: string; name: string }>;
+				const results: INodeListSearchItems[] = teams
+					// @ts-ignore
+					.map((c) => ({
+						name: c.name,
+						value: c.id,
+					}))
+					.filter(
+						(c) =>
+							!filter ||
+							c.name.toLowerCase().includes(filter.toLowerCase()) ||
+							c.value?.toString() === filter,
+					)
+					.sort((a, b) => {
+						if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+						if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+						return 0;
+					});
+				return { results };
+			},
+			async getDatabases(
+				this: ILoadOptionsFunctions,
+				filter?: string,
+			): Promise<INodeListSearchResult> {
+
+				const teamId = (this.getCurrentNodeParameter('teamId') as INodeParameterResourceLocator).value;
+				
+				console.log('teamId', this.getCurrentNodeParameter('teamId'));
+
+				const databases = await apiRequest.call(
+					this,
+					'GET',
+					'/teams/' + teamId + '/databases',
+					{},
+					{},
+				) as Array<{ id: string; name: string }>;
+				const results: INodeListSearchItems[] = databases
+					// @ts-ignore
+					.map((c) => ({
+						name: c.name,
+						value: c.id,
+					}))
+					.filter(
+						(c) =>
+							!filter ||
+							c.name.toLowerCase().includes(filter.toLowerCase()) ||
+							c.value?.toString() === filter,
+					)
+					.sort((a, b) => {
+						if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+						if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+						return 0;
+					});
+				return { results };
+			},
+			async getTables(
+				this: ILoadOptionsFunctions,
+				filter?: string,
+			): Promise<INodeListSearchResult> {
+
+				const teamId = (this.getCurrentNodeParameter('teamId') as INodeParameterResourceLocator).value;
+				const databaseId = (this.getCurrentNodeParameter('databaseId') as INodeParameterResourceLocator).value;
+		
+				const tables = await apiRequest.call(
+					this,
+					'GET',
+					'/teams/' + teamId + '/databases/' + databaseId + '/tables',
+					{},
+					{},
+				) as Array<{ id: string; name: string }>;
+				const results: INodeListSearchItems[] = tables
+					// @ts-ignore
+					.map((c) => ({
+						name: c.name,
+						value: c.id,
+					}))
+					.filter(
+						(c) =>
+							!filter ||
+							c.name.toLowerCase().includes(filter.toLowerCase()) ||
+							c.value?.toString() === filter,
+					)
+					.sort((a, b) => {
+						if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+						if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+						return 0;
+					});
+				return { results };
+			}
 		},
 	};
 

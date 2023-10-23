@@ -6,7 +6,6 @@ import {
 	IHttpRequestMethods,
 	IHttpRequestOptions,
 	IPollFunctions,
-	NodeOperationError,
 } from 'n8n-workflow';
 
 /**
