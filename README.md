@@ -14,7 +14,8 @@ It adds two nodes:
 
 [Supported Operations](#supported-operations)  
 [Installation](#installation)  
-[Credentials](#credentials)  
+[Credentials](#credentials)
+[Usage](#usage)  
 [Compatibility](#compatibility)  
 [Notes for an improvement](#Notes-for-an-improvement)  
 [Resources](#resources)  
@@ -63,6 +64,39 @@ Follow these steps as you can find in the [api docs of Ninox](https://docs.ninox
 Basicly the same steps as for Public Cloud users. 
 You just need to define a Custom URL in the n8n credentials for Ninox.
 Your URL will be something like ```https://mycompany.ninox.com/v1``` for Private Cloud users and ```https://myninox.mydomain.com/v1``` for On-Premise users.
+
+## Usage
+
+The Ninox Node can be used to List and Delete Records, but also to Create and Update those.
+To create a new Record, it is adviced to use the [Edit Set Node](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.set/) to prepare the fields. 
+
+An example implementation might look like this: 
+![n8n Ninox flow Overview](/docs/img/overview.png)
+
+### Updating
+Recognize the 4 Steps to update an item:
+* Get all items
+* Find specific item
+* Update DataSet
+* Transfer to Ninox
+
+![Detailed view](/docs/img/zoom_to_2_nodes.png)
+
+Updating the data might look like this:
+
+![Update Set](/docs/img/update_node.png)
+
+
+### Creating
+
+To create a new Ninox Record with data included, you should use the [Edit Set Node](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.set/) as well. 
+
+**Important**: Make sure to select the option "No Input fields" to ensure you have no fields in your ```$json```.
+
+The Create Node might Look like this
+![Create Set](/docs/img/create_node.png)
+
+A tutorial can be found [here](https://www.youtube.com/watch?v=z2mhvSrtRGc)
 
 ## Compatibility
 
