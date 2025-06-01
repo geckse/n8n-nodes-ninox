@@ -5,7 +5,8 @@ import {
 	INodeTypeDescription,
 	INodeListSearchResult,
 	INodeListSearchItems,
-	INodeParameterResourceLocator
+	INodeParameterResourceLocator,
+	NodeConnectionType
 } from 'n8n-workflow';
 
 import { createRecordsOptions } from './actions/createRecords';
@@ -23,13 +24,15 @@ export class Ninox implements INodeType {
 		group: ['input'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
-		description: 'Read, create and update data from Ninox',
+		description: 'Read, create, update and delete data from Ninox',
 		defaults: {
 			name: 'Ninox',
 			color: '#4970FF',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
+		// @ts-ignore
+		usableAsTool: true,
 		credentials: [
 			{
 				name: 'ninoxApi',
@@ -46,15 +49,7 @@ export class Ninox implements INodeType {
 		},
 
 		/**
-		 * In the properties array we have two mandatory options objects required
-		 *
-		 * [Resource & Operation]
-		 *
-		 * https://docs.n8n.io/integrations/creating-nodes/code/create-first-node/#resources-and-operations
-		 *
-		 * In our example, the operations are separated into their own file (HTTPVerbDescription.ts)
-		 * to keep this class easy to read.
-		 *
+		 * Main Resources and Operations for Ninox
 		 */
 		properties: [
 			// ----------------------------------

@@ -1,4 +1,3 @@
-import { IExecuteFunctions, IHookFunctions, ILoadOptionsFunctions } from 'n8n-core';
 import {
 	GenericValue,
 	ICredentialDataDecryptedObject,
@@ -6,6 +5,9 @@ import {
 	IHttpRequestMethods,
 	IHttpRequestOptions,
 	IPollFunctions,
+	IExecuteFunctions, 
+	IHookFunctions, 
+	ILoadOptionsFunctions 
 } from 'n8n-workflow';
 
 /**
