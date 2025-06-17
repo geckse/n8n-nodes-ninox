@@ -13,7 +13,10 @@ export class NinoxApi implements ICredentialType {
 		{
 			displayName: 'API Key',
 			name: 'token',
-			type: 'password',
+			type: 'string',
+			typeOptions: {
+				password: true,
+			},
 			default: '',
 		},
 		{
