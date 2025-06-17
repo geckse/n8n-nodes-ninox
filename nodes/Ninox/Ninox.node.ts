@@ -1,12 +1,7 @@
 import {
-	ILoadOptionsFunctions,
-	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
-	INodeListSearchResult,
-	INodeListSearchItems,
-	INodeParameterResourceLocator,
-	NodeConnectionType
+	NodeConnectionType,
 } from 'n8n-workflow';
 
 import { createRecordsOptions } from './actions/createRecords';
@@ -14,7 +9,7 @@ import { updateRecordsOptions } from './actions/updateRecords';
 import { uploadFileOptions } from './actions/uploadFile';
 import { handleIncommingFile } from './actions/handleIncommingFile';
 
-import { apiRequest } from './transport';
+import { listSearch, loadOptions, resourceMapping } from './methods';
 
 export class Ninox implements INodeType {
 	description: INodeTypeDescription = {
@@ -31,8 +26,20 @@ export class Ninox implements INodeType {
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
-		// @ts-ignore
 		usableAsTool: true,
+		codex: {
+			categories: ['Database', 'Ninox'],
+			resources: {
+				primaryDocumentation: [
+					{
+						url: 'https://github.com/geckse/n8n-nodes-ninox',
+					},
+					{
+						url: 'https://docs.ninox.com/api/rest-api',
+					},
+				],
+			},
+		},
 		credentials: [
 			{
 				name: 'ninoxApi',
@@ -47,6 +54,19 @@ export class Ninox implements INodeType {
 				'Content-Type': 'application/json',
 			},
 		},
+		
+		
+		/* requestOperations: {
+			pagination: {
+				type: 'offset',
+				properties: {
+					limitParameter: 'perPage',
+					offsetParameter: 'page',
+					pageSize: 250,
+					type: 'query',
+				},
+			},
+		},*/
 
 		/**
 		 * Main Resources and Operations for Ninox
@@ -72,7 +92,31 @@ export class Ninox implements INodeType {
 								method: 'GET',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
 							},
-						},
+							operations: {
+								pagination: {
+									
+									type: 'generic',
+											properties: {
+											continue: '={{ Array.isArray($response.body) && $response.body.length > 0 }}',
+											request: {
+												qs: {
+													page: '={{ $request.qs.page ? $request.qs.page + 1 : 0 }}',
+													perPage: 10,
+												}
+											}
+									}
+				
+									
+									/*type: 'offset',
+									properties: {
+										limitParameter: 'perPage',
+										offsetParameter: 'page',
+										pageSize: 10,
+										type: 'query'
+									}*/
+								}
+							}
+						}
 					},
 					{
 						name: 'Read',
@@ -243,7 +287,7 @@ export class Ninox implements INodeType {
 				displayName: 'Ninox Team',
 				name: 'teamId',
 				type: 'resourceLocator',
-				default: '',
+				default: { mode: 'list', value: '' },
 				placeholder: '',
 				required: true,
 				description: 'The ID of the team to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
@@ -303,7 +347,7 @@ export class Ninox implements INodeType {
 				displayName: 'Ninox Database',
 				name: 'databaseId',
 				type: 'resourceLocator',
-				default: '',
+				default: { mode: 'list', value: '' },
 				placeholder: '',
 				required: true,
 				description: 'The ID of the database to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
@@ -370,7 +414,7 @@ export class Ninox implements INodeType {
 				displayName: 'Ninox Table',
 				name: 'tableId',
 				type: 'resourceLocator',
-				default: '',
+				default: { mode: 'list', value: '' },
 				placeholder: '',
 				required: true,
 				displayOptions: {
@@ -596,16 +640,8 @@ export class Ninox implements INodeType {
 				},
 				default: false,
 				routing: {
-					operations: {
-						pagination: {
-							type: 'offset',
-							properties: {
-								limitParameter: 'perPage',
-								offsetParameter: 'page',
-								pageSize: 250,
-								type: 'query',
-							},
-						},
+					send: {
+						paginate: '={{$value}}',
 					},
 				},
 				description: 'Whether to return all results or only up to a given limit',
@@ -654,52 +690,43 @@ export class Ninox implements INodeType {
 				default: 50,
 				description: 'Max number of results to return',
 			},
-
-			// ----------------------------------
-			//         All Fields behavior
-			// ----------------------------------
-			{
-				displayName: 'Add All Fields',
-				name: 'addAllFields',
-				type: 'boolean',
-				displayOptions: {
-					show: {
-						operation: [
-							'create',
-							'update',
-						],
-					},
-				},
-				default: true,
-				description: 'Whether to send all fields to Ninox or only specific ones',
-			},
-			{
-				displayName: 'Fields',
-				name: 'fields',
-				type: 'string',
-				typeOptions: {
-					multipleValues: true,
-					multipleValueButtonText: 'Add Field',
-				},
-				displayOptions: {
-					show: {
-						addAllFields: [
-							false,
-						],
-						operation: [
-							'create',
-							'update',
-						],
-					},
-				},
-				default: [],
-				placeholder: 'Name',
-				required: true,
-				description: 'The name of fields for which data should be sent to Ninox',
-			},
 			// ----------------------------------
 			//         Additional Options 
 			// ----------------------------------			
+			{
+				displayName: 'Fields',
+				name: 'fields',
+				type: 'resourceMapper',
+				noDataExpression: true,
+				default: {
+					mappingMode: 'defineBelow',
+					value: null,
+				},
+				required: true,
+				typeOptions: {
+					loadOptionsDependsOn: ['tableId.value'],
+					resourceMapper: {
+						resourceMapperMethod: 'getFields',
+						mode: 'add',
+						fieldWords: {
+							singular: 'field',
+							plural: 'fields',
+						},
+						multiKeyMatch: false,
+						matchingFieldsLabels: {
+							title: 'Field matching with your Ninox table',
+							description: 'Map the fields of your node input to the fields of your Ninox table'
+						},
+					},
+				},
+				displayOptions: {
+					show: {
+						operation: ['create', 'update'],
+					},
+					hide: {
+					},
+				},
+			},
 			{
 				displayName: 'Additional Options',
 				name: 'additionalOptions',
@@ -875,169 +902,16 @@ export class Ninox implements INodeType {
 							},
 						},
 						default: '',
-					},
-
+					}
 				],
 			},
 		],
 	};
 
 	methods = {
-		loadOptions: {
-			async getTeams(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const teams = await apiRequest.call(
-					this,
-					'GET',
-					'/teams',
-					{},
-					{},
-				);
-				// @ts-ignore
-				const returnData = teams.map((o) => ({
-					name: o.name,
-					value: o.id,
-				})) as INodePropertyOptions[];
-				return returnData;
-			},
-			async getDatabases(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-
-				const teamId = this.getCurrentNodeParameter('teamId') as string;
-
-				const databases = await apiRequest.call(
-					this,
-					'GET',
-					'/teams/' + teamId + '/databases',
-					{},
-					{},
-				);
-				// @ts-ignore
-				const returnData = databases.map((o) => ({
-					name: o.name,
-					value: o.id,
-				})) as INodePropertyOptions[];
-				return returnData;
-			},
-			async getTables(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-
-				const teamId = this.getCurrentNodeParameter('teamId') as string;
-				const databaseId = this.getCurrentNodeParameter('databaseId') as string;
-
-				const tables = await apiRequest.call(
-					this,
-					'GET',
-					'/teams/' + teamId + '/databases/' + databaseId + '/tables',
-					{},
-					{},
-				);
-				// @ts-ignore
-				const returnData = tables.map((o) => ({
-					name: o.name,
-					value: o.id,
-				})) as INodePropertyOptions[];
-				return returnData;
-			},
-		},
-		listSearch: {
-			async getTeams(
-				this: ILoadOptionsFunctions,
-				filter?: string,
-			): Promise<INodeListSearchResult> {
-				const teams = await apiRequest.call(
-					this,
-					'GET',
-					'/teams',
-					{},
-					{},
-				) as Array<{ id: string; name: string }>;
-				const results: INodeListSearchItems[] = teams
-					// @ts-ignore
-					.map((c) => ({
-						name: c.name,
-						value: c.id,
-					}))
-					.filter(
-						(c) =>
-							!filter ||
-							c.name.toLowerCase().includes(filter.toLowerCase()) ||
-							c.value?.toString() === filter,
-					)
-					.sort((a, b) => {
-						if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-						if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-						return 0;
-					});
-				return { results };
-			},
-			async getDatabases(
-				this: ILoadOptionsFunctions,
-				filter?: string,
-			): Promise<INodeListSearchResult> {
-
-				const teamId = (this.getCurrentNodeParameter('teamId') as INodeParameterResourceLocator).value;
-				
-				console.log('teamId', this.getCurrentNodeParameter('teamId'));
-
-				const databases = await apiRequest.call(
-					this,
-					'GET',
-					'/teams/' + teamId + '/databases',
-					{},
-					{},
-				) as Array<{ id: string; name: string }>;
-				const results: INodeListSearchItems[] = databases
-					// @ts-ignore
-					.map((c) => ({
-						name: c.name,
-						value: c.id,
-					}))
-					.filter(
-						(c) =>
-							!filter ||
-							c.name.toLowerCase().includes(filter.toLowerCase()) ||
-							c.value?.toString() === filter,
-					)
-					.sort((a, b) => {
-						if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-						if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-						return 0;
-					});
-				return { results };
-			},
-			async getTables(
-				this: ILoadOptionsFunctions,
-				filter?: string,
-			): Promise<INodeListSearchResult> {
-
-				const teamId = (this.getCurrentNodeParameter('teamId') as INodeParameterResourceLocator).value;
-				const databaseId = (this.getCurrentNodeParameter('databaseId') as INodeParameterResourceLocator).value;
-		
-				const tables = await apiRequest.call(
-					this,
-					'GET',
-					'/teams/' + teamId + '/databases/' + databaseId + '/tables',
-					{},
-					{},
-				) as Array<{ id: string; name: string }>;
-				const results: INodeListSearchItems[] = tables
-					// @ts-ignore
-					.map((c) => ({
-						name: c.name,
-						value: c.id,
-					}))
-					.filter(
-						(c) =>
-							!filter ||
-							c.name.toLowerCase().includes(filter.toLowerCase()) ||
-							c.value?.toString() === filter,
-					)
-					.sort((a, b) => {
-						if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-						if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-						return 0;
-					});
-				return { results };
-			}
-		},
+		listSearch,
+		loadOptions,
+		resourceMapping,
 	};
 
 }
