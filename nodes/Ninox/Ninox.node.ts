@@ -1,7 +1,7 @@
 import {
-	INodeType,
-	INodeTypeDescription,
-	NodeConnectionType,
+	type INodeType,
+	type INodeTypeDescription,
+	NodeConnectionTypes,
 } from 'n8n-workflow';
 
 import { createRecordsOptions } from './actions/record/createRecords';
@@ -24,8 +24,8 @@ export class Ninox implements INodeType {
 			name: 'Ninox',
 			color: '#4970FF',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		usableAsTool: true,
 		codex: {
 			categories: ['Database', 'Ninox'],

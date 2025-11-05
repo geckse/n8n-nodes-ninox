@@ -1,8 +1,49 @@
-node_modules
-.DS_Store
-.tmp
-tmp
-dist
-npm-debug.log*
+# Dependencies
+node_modules/
+package-lock.json
 yarn.lock
-.vscode/launch.json
+pnpm-lock.yaml
+
+# Build output
+.build/
+dist/
+*.js
+*.d.ts
+*.js.map
+!jest.config.js
+
+# Serverless
+.serverless/
+.serverless_plugins/
+
+# Environment variables
+.env
+.env.*
+!.env.sample
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temp files
+.tmp
+tmp/
+temp/
+
+# NVM
+.nvmrc

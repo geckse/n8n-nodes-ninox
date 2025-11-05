@@ -1,12 +1,12 @@
-import {	
-	IDataObject,
-	ILoadOptionsFunctions,
-	INodeExecutionData,
-	INodePropertyOptions,
-	INodeType,
-	IPollFunctions,
-	INodeTypeDescription,
-	NodeConnectionType
+import {
+	type IDataObject,
+	type ILoadOptionsFunctions,
+	type INodeExecutionData,
+	type INodePropertyOptions,
+	type INodeType,
+	type IPollFunctions,
+	type INodeTypeDescription,
+	NodeConnectionTypes,
 } from 'n8n-workflow';
 
 import { apiRequest, apiRequestAllItems } from './transport';
@@ -26,7 +26,7 @@ export class NinoxTrigger implements INodeType {
 		},
 		polling: true,
 		inputs: [],
-		outputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'ninoxApi',
