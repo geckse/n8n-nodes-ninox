@@ -4,10 +4,10 @@ import {
 	NodeConnectionType,
 } from 'n8n-workflow';
 
-import { createRecordsOptions } from './actions/createRecords';
-import { updateRecordsOptions } from './actions/updateRecords';
-import { uploadFileOptions } from './actions/uploadFile';
-import { handleIncommingFile } from './actions/handleIncommingFile';
+import { createRecordsOptions } from './actions/record/createRecords';
+import { updateRecordsOptions } from './actions/record/updateRecords';
+import { uploadFileOptions } from './actions/file/uploadFile';
+import { handleIncommingFile } from './actions/file/handleIncommingFile';
 
 import { listSearch, loadOptions, resourceMapping } from './methods';
 
@@ -17,7 +17,7 @@ export class Ninox implements INodeType {
 		name: 'ninox',
 		icon: 'file:ninox.svg',
 		group: ['input'],
-		version: 1,
+		version: [1, 2],
 		subtitle: '={{$parameter["operation"]}}',
 		description: 'Read, create, update and delete data from Ninox',
 		defaults: {
@@ -73,6 +73,31 @@ export class Ninox implements INodeType {
 		 */
 		properties: [
 			// ----------------------------------
+			//         Resources
+			// ----------------------------------
+			{
+				displayName: 'Resource',
+				name: 'resource',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{
+						name: 'Schemas',
+						value: 'schema',
+					},
+					{
+						name: 'Record',
+						value: 'record',
+					},
+					{
+						name: 'File',
+						value: 'file',
+					}
+				],
+				default: 'record',
+			},
+
+			// ----------------------------------
 			//         Operations
 			// ----------------------------------
 			{
@@ -116,8 +141,17 @@ export class Ninox implements INodeType {
 									}*/
 								}
 							}
-						}
+						},
+						displayOptions: {
+							show: {
+								resource: ['record'],
+							},
+							hide: {
+								resource: ['schema', 'file'],
+							},
+						},
 					},
+
 					{
 						name: 'Read',
 						value: 'read',
@@ -127,6 +161,14 @@ export class Ninox implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}',
+							},
+						},
+						displayOptions: {
+							show: {
+								resource: ['record'],
+							},
+							hide: {
+								resource: ['schema', 'file'],
 							},
 						},
 					},
@@ -146,6 +188,14 @@ export class Ninox implements INodeType {
 								type: 'body',
 							},
 						},
+						displayOptions: {
+							show: {
+								resource: ['record'],
+							},
+							hide: {
+								resource: ['schema', 'file'],
+							},
+						},
 					},
 					{
 						name: 'Update',
@@ -161,6 +211,14 @@ export class Ninox implements INodeType {
 								paginate: false,
 								preSend: [updateRecordsOptions],
 								type: 'body',
+							},
+						},
+						displayOptions: {
+							show: {
+								resource: ['record'],
+							},
+							hide: {
+								resource: ['schema', 'file'],
 							},
 						},
 					},
@@ -185,6 +243,14 @@ export class Ninox implements INodeType {
 								],
 							},
 						},
+						displayOptions: {
+							show: {
+								resource: ['record'],
+							},
+							hide: {
+								resource: ['schema', 'file'],
+							},
+						},
 					},
 					{
 						name: 'List Attached Files',
@@ -195,6 +261,14 @@ export class Ninox implements INodeType {
 							request: {
 								method: 'GET',
 								url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records/{{$parameter.recordId}}/files',
+							},
+						},
+						displayOptions: {
+							show: {
+								resource: ['file'],
+							},
+							hide: {
+								resource: ['schema', 'record'],
 							},
 						},
 					},
@@ -212,6 +286,14 @@ export class Ninox implements INodeType {
 							},
 							output: {
 								postReceive: [handleIncommingFile],
+							},
+						},
+						displayOptions: {
+							show: {
+								resource: ['file'],
+							},
+							hide: {
+								resource: ['schema', 'record'],
 							},
 						},
 					},
@@ -241,6 +323,14 @@ export class Ninox implements INodeType {
 								],
 							},
 						},
+						displayOptions: {
+							show: {
+								resource: ['file'],
+							},
+							hide: {
+								resource: ['schema', 'record'],
+							},
+						},
 					},
 					{
 						name: 'Delete Attached File',
@@ -263,6 +353,14 @@ export class Ninox implements INodeType {
 								],
 							},
 						},
+						displayOptions: {
+							show: {
+								resource: ['file'],
+							},
+							hide: {
+								resource: ['schema', 'record'],
+							},
+						},
 					},
 					{
 						name: 'Ninox Script',
@@ -277,6 +375,14 @@ export class Ninox implements INodeType {
 							send: {
 								paginate: false,
 								type: 'body',
+							},
+						},
+						displayOptions: {
+							show: {
+								resource: ['record'],
+							},
+							hide: {
+								resource: ['schema', 'file'],
 							},
 						},
 					},
@@ -497,6 +603,9 @@ export class Ninox implements INodeType {
 				required: true,
 				displayOptions: {
 					show: {
+						resource: [
+							'record',
+						],
 						operation: [
 							'ninoxScript',
 						],
@@ -519,6 +628,7 @@ export class Ninox implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['record'],
 						operation: [
 							'read',
 						],
@@ -534,6 +644,7 @@ export class Ninox implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['record'],
 						operation: [
 							'update',
 						],
@@ -549,6 +660,7 @@ export class Ninox implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['record'],
 						operation: [
 							'delete',
 						],
@@ -569,6 +681,7 @@ export class Ninox implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['file'],
 						operation: [
 							'listFiles',
 							'getFile',
@@ -587,6 +700,7 @@ export class Ninox implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['file'],
 						operation: [
 							'getFile',
 							'deleteFile'
@@ -603,6 +717,7 @@ export class Ninox implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['file'],
 						operation: [
 							'uploadFile',
 						],
@@ -618,6 +733,7 @@ export class Ninox implements INodeType {
 				type: 'string',
 				displayOptions: {
 					show: {
+						resource: ['file'],
 						operation: [
 							'uploadFile',
 						],
@@ -635,7 +751,11 @@ export class Ninox implements INodeType {
 				type: 'boolean',
 				displayOptions: {
 					show: {
+						resource: ['record'],
 						operation: ['list'],
+						'@version': [
+							1,
+						],
 					},
 				},
 				default: false,
@@ -652,6 +772,7 @@ export class Ninox implements INodeType {
 				type: 'number',
 				displayOptions: {
 					show: {
+						resource: ['record'],
 						operation: ['list'],
 						returnAll: [false],
 					},
@@ -673,6 +794,7 @@ export class Ninox implements INodeType {
 				type: 'number',
 				displayOptions: {
 					show: {
+						resource: ['record'],
 						operation: ['list'],
 						returnAll: [false],
 					},
@@ -721,9 +843,11 @@ export class Ninox implements INodeType {
 				},
 				displayOptions: {
 					show: {
+						resource: ['record'],
 						operation: ['create', 'update'],
-					},
-					hide: {
+						'@version': [
+							2,
+						],
 					},
 				},
 			},
@@ -733,7 +857,11 @@ export class Ninox implements INodeType {
 				type: 'collection',
 				displayOptions: {
 					show: {
+						resource: ['record'],
 						operation: ['list'],
+						'@version': [
+							2,
+						],
 					},
 				},
 				default: {},
@@ -750,16 +878,6 @@ export class Ninox implements INodeType {
 							multipleValues: true,
 						},
 						default: {},
-						displayOptions: {
-							hide: {
-								sortUpdate: [
-									true,
-								],
-								sortNew: [
-									true,
-								],
-							},
-						},
 						options: [
 							{
 								name: 'property',
@@ -827,16 +945,6 @@ export class Ninox implements INodeType {
 								value: 'true',
 							},
 						},
-						displayOptions: {
-							hide: {
-								sort: [
-									true,
-								],
-								sortNew: [
-									true,
-								],
-							},
-						},
 						default: true,
 					},
 					{
@@ -849,16 +957,6 @@ export class Ninox implements INodeType {
 								type: 'query',
 								property: 'new',
 								value: 'true',
-							},
-						},
-						displayOptions: {
-							hide: {
-								sort: [
-									true,
-								],
-								sortUpdate: [
-									true,
-								],
 							},
 						},
 						default: true,
