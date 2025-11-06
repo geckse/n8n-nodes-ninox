@@ -16,17 +16,58 @@ export const v2Operations: INodePropertyOptions[] = [
 				url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
 			},
 			operations: {
-				pagination: {
-					type: 'generic',
-					properties: {
-						continue: '={{ Array.isArray($response.body) && $response.body.length > 0 }}',
-						request: {
-							qs: {
-								page: '={{ $request.qs.page ? $request.qs.page + 1 : 0 }}',
-								perPage: 10,
+				pagination: async function(this, requestOptions) {
+					const returnData = [];
+					let page = 0;
+					const limit = this.getNodeParameter('limit', 500) as number;
+					const returnAll = this.getNodeParameter('returnAll', false) as boolean;
+					const maxPages = 100;
+					const seenIds = new Set();
+
+					while (page < maxPages) {
+						// Add pagination params - always use 500 for efficiency
+						requestOptions.options.qs = requestOptions.options.qs || {};
+						requestOptions.options.qs.page = page;
+						requestOptions.options.qs.perPage = 500;
+
+						// Make request
+						const responseData = await this.makeRoutingRequest(requestOptions);
+
+						// Check if we got data
+						if (!Array.isArray(responseData) || responseData.length === 0) {
+							break; // Empty response, stop
+						}
+
+						// Check for duplicate data (API returning same page)
+						if (responseData[0]?.id && seenIds.has(responseData[0].id)) {
+							break; // Duplicate found, stop
+						}
+
+						// Track IDs and add data
+						for (const item of responseData) {
+							if (item.id) seenIds.add(item.id);
+							returnData.push(item);
+
+							// If not returning all and we've hit the limit, stop
+							if (!returnAll && returnData.length >= limit) {
+								return this.helpers.returnJsonArray(returnData.slice(0, limit));
 							}
 						}
+
+						// If we got less than 500, we're on last page
+						if (responseData.length < 500) {
+							break;
+						}
+
+						page++;
 					}
+
+					// Apply limit if not returning all
+					if (!returnAll && returnData.length > limit) {
+						return this.helpers.returnJsonArray(returnData.slice(0, limit));
+					}
+
+					return this.helpers.returnJsonArray(returnData);
 				}
 			}
 		},

@@ -268,7 +268,7 @@ export const sharedParameters: INodeProperties[] = [
 		},
 		typeOptions: {
 			minValue: 1,
-			maxValue: 250,
+			maxValue: 500,
 		},
 		routing: {
 			send: {
@@ -276,7 +276,7 @@ export const sharedParameters: INodeProperties[] = [
 				property: 'perPage',
 			},
 		},
-		default: 50,
+		default: 100,
 		description: 'Max number of results to return',
 	},
 
