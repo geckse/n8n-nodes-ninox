@@ -134,7 +134,7 @@ export const sharedParameters: INodeProperties[] = [
 			hide: {
 				teamId: [''],
 				databaseId: [''],
-				operation: ['ninoxScript'],
+				operation: ['ninoxScript', 'getDatabaseSchema', 'getTablesSchema'],
 			},
 		},
 		modes: [

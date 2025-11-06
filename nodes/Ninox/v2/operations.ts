@@ -294,4 +294,59 @@ export const v2Operations: INodePropertyOptions[] = [
 			},
 		},
 	},
+	// Schema operations
+	{
+		name: 'Get Database Schema',
+		value: 'getDatabaseSchema',
+		description: 'Retrieve the schema for a single database',
+		action: 'Get database schema',
+		routing: {
+			request: {
+				method: 'GET',
+				url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}',
+			},
+		},
+		displayOptions: {
+			show: {
+				'@version': [2],
+				resource: ['schema'],
+			},
+		},
+	},
+	{
+		name: 'Get Tables Schema',
+		value: 'getTablesSchema',
+		description: 'Retrieve the schema for all tables in a database',
+		action: 'Get all tables schema',
+		routing: {
+			request: {
+				method: 'GET',
+				url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables',
+			},
+		},
+		displayOptions: {
+			show: {
+				'@version': [2],
+				resource: ['schema'],
+			},
+		},
+	},
+	{
+		name: 'Get Single Table Schema',
+		value: 'getTableSchema',
+		description: 'Retrieve the schema for a single table',
+		action: 'Get single table schema',
+		routing: {
+			request: {
+				method: 'GET',
+				url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}',
+			},
+		},
+		displayOptions: {
+			show: {
+				'@version': [2],
+				resource: ['schema'],
+			},
+		},
+	},
 ];
