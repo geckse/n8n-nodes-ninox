@@ -12,39 +12,72 @@ export const updateRecordsOptions = async function (
 ): Promise<IHttpRequestOptions> {
 		const item = this.getInputData() as INodeExecutionData;
 		const recordId = this.getNodeParameter('recordId');
-		
+		const nodeVersion = this.getNode().typeVersion;
+
 		let bodyData = {} as IDataObject;
-				
-		const dataMode = this.getNodeParameter('fields.mappingMode', 0) as string; 
-		// we defined what to send
-		if(dataMode === 'defineBelow'){
-			
-			const mappingValues = this.getNodeParameter('fields.value', 0) as IDataObject;
-			if (Object.keys(mappingValues).length === 0) {
-				throw new NodeOperationError(
-					this.getNode(),
-					"At least one value has to be added under 'Fields to Send'",
-				);
+
+		// Handle v1 with addAllFields
+		if (nodeVersion === 1) {
+			const addAllFields = this.getNodeParameter('addAllFields', true) as boolean;
+			let fields: string[] = [];
+
+			if (!addAllFields) {
+				fields = this.getNodeParameter('fieldsToSend') as string[];
 			}
 
-			bodyData = {
-				id: recordId,
-				fields: mappingValues
-			};
-
-		} 
-		
-		if(dataMode === 'autoMapInputData') { // the Input should be sent as fields
 			// sending complete record, or just the fields?
-			if(item.json.id && item.json.fields){
-					bodyData = item.json;
-			} else { 
-					bodyData = {
-							id: recordId,
-							fields: item.json,
-					};
+			if (item.json.id && item.json.fields) {
+				bodyData = item.json;
+			} else {
+				bodyData = {
+					id: recordId,
+					fields: item.json,
+				};
 			}
-		} 
+
+			// remove fields that should not be sent
+			if (!addAllFields && bodyData.fields) {
+				const cleanedFields = {} as IDataObject;
+				for (const field of fields) {
+					// @ts-ignore
+					cleanedFields[field] = bodyData.fields[field];
+				}
+				bodyData.fields = cleanedFields;
+			}
+		}
+		// Handle v2 with resourceMapper
+		else {
+			const dataMode = this.getNodeParameter('fields.mappingMode', 0) as string;
+			// we defined what to send
+			if(dataMode === 'defineBelow'){
+
+				const mappingValues = this.getNodeParameter('fields.value', 0) as IDataObject;
+				if (Object.keys(mappingValues).length === 0) {
+					throw new NodeOperationError(
+						this.getNode(),
+						"At least one value has to be added under 'Fields to Send'",
+					);
+				}
+
+				bodyData = {
+					id: recordId,
+					fields: mappingValues
+				};
+
+			}
+
+			if(dataMode === 'autoMapInputData') { // the Input should be sent as fields
+				// sending complete record, or just the fields?
+				if(item.json.id && item.json.fields){
+						bodyData = item.json;
+				} else {
+						bodyData = {
+								id: recordId,
+								fields: item.json,
+						};
+				}
+			}
+		}
 
 		if(bodyData.id !== recordId){
 				throw new Error('The Record ID does not match the provided recordId. Consider using an expression to dynamical update multiple records.');
