@@ -299,6 +299,162 @@ export const v1Operations: INodePropertyOptions[] = [
 				paginate: false,
 				type: 'body',
 			},
+			output: {
+				postReceive: [
+					async function(this: any, items: any, responseData: any) {
+						const parseAsJson = this.getNodeParameter('parseAsJson', 0) as boolean;
+						const splitIntoItems = this.getNodeParameter('splitIntoItems', 0) as boolean;
+						const fetchAsRecords = this.getNodeParameter('fetchAsRecords', 0) as boolean;
+
+						// If parseAsJson is enabled, parse the entire response as JSON
+						if (parseAsJson) {
+							try {
+								let jsonData = responseData;
+
+								// If the response is wrapped in items structure, extract it
+								if (items && items.length > 0 && items[0].json) {
+									jsonData = items[0].json;
+								}
+
+								// If it's a string, try to parse it as JSON
+								if (typeof jsonData === 'string') {
+									jsonData = JSON.parse(jsonData);
+								}
+
+								// Return the parsed data as a single item
+								return [{
+									json: jsonData,
+									pairedItem: { item: 0 },
+								}];
+							} catch (error: any) {
+								throw new Error(
+									`Failed to parse response as JSON: ${error.message}. ` +
+									`Response: ${JSON.stringify(responseData).substring(0, 200)}`
+								);
+							}
+						}
+
+						if (!splitIntoItems) {
+							// Return the script response as-is
+							return items;
+						}
+
+						let arrayItems: any[] = [];
+
+						// First, extract the actual data from items if responseData is not the raw response
+						let actualData = responseData;
+						if (items && items.length > 0 && items[0].json) {
+							actualData = items[0].json;
+						}
+
+						// Handle nested array structure [["ID1", "ID2", "ID3"]] or single array
+						if (Array.isArray(actualData)) {
+							// Check if it's a nested array
+							if (actualData.length > 0 && Array.isArray(actualData[0])) {
+								// Flatten the nested array
+								arrayItems = actualData[0];
+							} else {
+								// Single array
+								arrayItems = actualData;
+							}
+						} else if (typeof actualData === 'string') {
+							// Handle comma-separated string (fallback)
+							arrayItems = actualData
+								.split(',')
+								.map((item: string) => item.trim())
+								.filter((item: string) => item.length > 0);
+						} else {
+							throw new Error(
+								`Script did not return an array or string to split. ` +
+								`Expected array or comma-separated string but received: ${typeof actualData}. ` +
+								`Response data: ${JSON.stringify(actualData).substring(0, 200)}. ` +
+								`Please disable "Split Into Items" option.`
+							);
+						}
+
+						if (arrayItems.length === 0) {
+							throw new Error(
+								'Script returned no items to split. ' +
+								'Please check your script or disable "Split Into Items" option.'
+							);
+						}
+
+						// If fetchAsRecords is enabled, treat items as record IDs and fetch them
+						if (fetchAsRecords) {
+							// Convert all items to strings for ID validation
+							const recordIds = arrayItems.map((id: any) => String(id).trim()).filter((id: string) => id.length > 0);
+
+							// Validate that IDs look like valid record IDs (alphanumeric)
+							const invalidIds = recordIds.filter((id: string) => !/^[a-zA-Z0-9]+$/.test(id));
+							if (invalidIds.length > 0) {
+								throw new Error(
+									`Script returned invalid record IDs: ${invalidIds.join(', ')}. ` +
+									`Please disable "Fetch As Records" option if not returning record IDs.`
+								);
+							}
+
+							// Get the team and database parameters for the API calls
+							// Handle resourceLocator format for teamId and databaseId
+							const teamIdParam = this.getNodeParameter('teamId', 0);
+							const teamId = typeof teamIdParam === 'object' ? teamIdParam.value : teamIdParam;
+
+							const databaseIdParam = this.getNodeParameter('databaseId', 0);
+							const databaseId = typeof databaseIdParam === 'object' ? databaseIdParam.value : databaseIdParam;
+
+							// Fetch each record
+							const fetchedRecords = [];
+							for (const recordId of recordIds) {
+								try {
+									// Extract table ID and numeric record ID (e.g., "B78670" -> table "B", record "78670")
+									const match = recordId.match(/^([A-Z]+)(\d+)$/i);
+									if (!match) {
+										throw new Error(`Invalid record ID format: ${recordId}. Expected format like "B78670" where letters indicate the table.`);
+									}
+									const tableId = match[1];
+									const numericRecordId = match[2];
+
+									// Get credentials and base URL
+									const credentials = await this.getCredentials('ninoxApi');
+									const baseUrl = credentials.customBaseUrl ?
+										String(credentials.baseUrl).replace(/\/$/, '') :
+										'https://api.ninox.com/v1';
+
+									const options = {
+										method: 'GET',
+										url: `${baseUrl}/teams/${teamId}/databases/${databaseId}/tables/${tableId}/records/${numericRecordId}`,
+										headers: {
+											'Authorization': `Bearer ${credentials.token}`,
+											'Accept': 'application/json',
+											'Content-Type': 'application/json',
+										},
+										json: true,
+									};
+									const record = await this.helpers.request(options);
+									fetchedRecords.push(record);
+								} catch (error: any) {
+									// Include error information for failed fetches
+									fetchedRecords.push({
+										id: recordId,
+										error: `Failed to fetch record: ${error.message}`,
+									});
+								}
+							}
+
+							// Return the fetched records as individual items
+							return fetchedRecords.map((record: any) => ({
+								json: record,
+								pairedItem: { item: 0 },
+							}));
+						} else {
+							// Just split into items without fetching
+							return arrayItems.map((item: any) => ({
+								json: typeof item === 'object' ? item : { value: item },
+								pairedItem: { item: 0 },
+							}));
+						}
+					},
+				],
+			},
 		},
 		displayOptions: {
 			show: {

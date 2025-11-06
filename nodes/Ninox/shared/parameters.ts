@@ -211,6 +211,45 @@ export const sharedParameters: INodeProperties[] = [
 		},
 		description: 'Use an Ninox Script to build your own query',
 	},
+	{
+		displayName: 'Parse As JSON',
+		name: 'parseAsJson',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				operation: ['ninoxScript'],
+			},
+		},
+		default: false,
+		description: 'When enabled, parse the entire response as JSON and return it as a single item. Useful for complex data structures.',
+	},
+	{
+		displayName: 'Split Into Items',
+		name: 'splitIntoItems',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				operation: ['ninoxScript'],
+				parseAsJson: [false],
+			},
+		},
+		default: false,
+		description: 'When enabled, if the script returns an array, split it into separate items. Each array element becomes an individual item.',
+	},
+	{
+		displayName: 'Fetch As Records',
+		name: 'fetchAsRecords',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				operation: ['ninoxScript'],
+				parseAsJson: [false],
+				splitIntoItems: [true],
+			},
+		},
+		default: false,
+		description: 'When enabled along with "Split Into Items", treat the array values as record IDs and fetch each record. Will show an error if values are not valid record IDs.',
+	},
 
 	// ----------------------------------
 	//         v1 Pagination Parameters
