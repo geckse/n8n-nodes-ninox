@@ -134,7 +134,7 @@ For complex data queries:
 1. Select Resource: "Record", Operation: "List"
 2. Enable advanced options:
    - Sort by Field: Choose field and direction (ASC/DESC)
-   - Filters: Add JSON query like `{"field": "status", "op": "=", "value": "active"}`
+   - Filters: Add JSON query like `{"fields": {"Email": "example@mail.com"}}`
    - Since Sequence: Track changes since last sync
 
 ### Ninox Script Options
