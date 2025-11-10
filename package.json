@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-ninox",
-  "version": "1.1.3",
-  "description": "This package contains two nodes for n8n which can be used to interact with Ninox.",
+  "version": "2.0.1",
+  "description": "This package contains two nodes for n8n to interact with Ninox.",
   "keywords": [
     "n8n-community-node-package",
     "n8n-node-package",
@@ -20,20 +20,25 @@
     "type": "git",
     "url": "https://github.com/geckse/n8n-nodes-ninox.git"
   },
+  "engines": {
+    "node": ">=20.15"
+  },
   "main": "index.js",
   "scripts": {
-    "build": "tsc && gulp build:icons",
-    "dev": "tsc --watch",
-    "format": "prettier nodes credentials --write",
-    "lint": "tslint -p tsconfig.json -c tslint.json && eslint nodes credentials package.json",
-    "lintfix": "tslint --fix -p tsconfig.json -c tslint.json && eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    "build": "n8n-node build",
+    "build:watch": "tsc --watch",
+    "dev": "n8n-node dev",
+    "lint": "n8n-node lint",
+    "lint:fix": "n8n-node lint --fix",
+    "release": "n8n-node release",
+    "prepublishOnly": "n8n-node prerelease"
   },
   "files": [
     "dist"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
+    "strict": true,
     "credentials": [
       "dist/credentials/NinoxApi.credentials.js"
     ],
@@ -43,16 +48,18 @@
     ]
   },
   "devDependencies": {
-    "@types/express": "^4.17.14",
-    "@types/request-promise-native": "~1.0.15",
-    "@typescript-eslint/parser": "^5.39.0",
-    "eslint-plugin-n8n-nodes-base": "^1.9.5",
-    "gulp": "^4.0.2",
-    "n8n-core": "^0.125.0",
-    "n8n-workflow": "^0.107.0",
-    "prettier": "^2.7.1",
-    "tslint": "^6.1.2",
-    "typescript": "~4.6.0"
+    "@n8n/node-cli": "*",
+    "@types/node": "^20.0.0",
+    "eslint": "9.32.0",
+    "n8n-workflow": "^1.116.0",
+    "prettier": "3.6.2",
+    "release-it": "^19.0.4",
+    "typescript": "5.9.2"
   },
-  "dependencies": {}
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "overrides": {
+    "change-case": "4.1.2"
+  }
 }

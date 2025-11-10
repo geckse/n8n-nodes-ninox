@@ -3,17 +3,22 @@ import {
 	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
+	Icon,
 } from 'n8n-workflow';
 
 export class NinoxApi implements ICredentialType {
 	name = 'ninoxApi';
 	displayName = 'Ninox API Credentials API';
 	documentationUrl = 'https://docs.ninox.com/en/api/introduction#obtaining-a-personal-access-token';
+	icon: Icon = 'file:ninox.svg';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',
 			name: 'token',
 			type: 'string',
+			typeOptions: {
+				password: true,
+			},
 			default: '',
 		},
 		{
