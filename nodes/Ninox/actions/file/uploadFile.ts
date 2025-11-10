@@ -1,11 +1,18 @@
+/*
+	Note about the eslint disable lines:
+	I need FormData, somehow default n8n nodes also rely on it.
+	Since it's also native in node 18+, I don't think the linter should be aggressive about it.
+	@geckse 
+*/
+
+// eslint-disable-next-line @n8n/community-nodes/no-restricted-imports
+import type FormData from 'form-data';
 import {
 	IBinaryData,
 	IExecuteSingleFunctions,
 	IHttpRequestOptions,
 	NodeOperationError
 } from 'n8n-workflow';
-
-import FormData from 'form-data';
 
 export const uploadFileOptions = async function (
 	this: IExecuteSingleFunctions,
@@ -35,7 +42,10 @@ export const uploadFileOptions = async function (
 			binaryPropertyName,
 		);
 
-		const formData = new FormData();
+		// Use form-data package available in n8n runtime (type-only import above)
+		// eslint-disable-next-line @typescript-eslint/no-require-imports, @n8n/community-nodes/no-restricted-imports
+		const FormDataConstructor = require('form-data');
+		const formData = new FormDataConstructor() as FormData;
 		formData.append('file', binaryDataBuffer, binaryProperty.fileName);
 
 		if (attachmentField) {
