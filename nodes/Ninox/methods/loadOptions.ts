@@ -1,4 +1,4 @@
-import { INodePropertyOptions, ILoadOptionsFunctions } from "n8n-workflow";
+import { IDataObject, INodePropertyOptions, ILoadOptionsFunctions } from "n8n-workflow";
 import { apiRequest } from "../transport";
 
 export async function getTeams(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -9,10 +9,9 @@ export async function getTeams(this: ILoadOptionsFunctions): Promise<INodeProper
         {},
         {},
     );
-    // @ts-ignore
-    const returnData = teams.map((o) => ({
-        name: o.name,
-        value: o.id,
+    const returnData = (teams as IDataObject[]).map((o) => ({
+        name: o.name as string,
+        value: o.id as string,
     })) as INodePropertyOptions[];
     return returnData;
 };
@@ -28,10 +27,9 @@ export async function getDatabases(this: ILoadOptionsFunctions): Promise<INodePr
         {},
         {},
     );
-    // @ts-ignore
-    const returnData = databases.map((o) => ({
-        name: o.name,
-        value: o.id,
+    const returnData = (databases as IDataObject[]).map((o) => ({
+        name: o.name as string,
+        value: o.id as string,
     })) as INodePropertyOptions[];
     return returnData;
 };
@@ -48,10 +46,9 @@ export async function getTables(this: ILoadOptionsFunctions): Promise<INodePrope
         {},
         {},
     );
-    // @ts-ignore
-    const returnData = tables.map((o) => ({
-        name: o.name,
-        value: o.id,
+    const returnData = (tables as IDataObject[]).map((o) => ({
+        name: o.name as string,
+        value: o.id as string,
     })) as INodePropertyOptions[];
     return returnData;
 };
@@ -68,10 +65,9 @@ export async function getFields(this: ILoadOptionsFunctions): Promise<INodePrope
         {},
         {},
     );
-    // @ts-ignore
-    const returnData = fields.map((o) => ({
-        name: o.name,
-        value: o.id,
+    const returnData = (fields as IDataObject[]).map((o) => ({
+        name: o.name as string,
+        value: o.id as string,
     })) as INodePropertyOptions[];
     return returnData;
 };

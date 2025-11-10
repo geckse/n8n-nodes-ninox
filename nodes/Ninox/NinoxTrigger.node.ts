@@ -22,11 +22,11 @@ export class NinoxTrigger implements INodeType {
 		description: 'Starts the workflow when Ninox events occur',
 		defaults: {
 			name: 'Ninox Trigger',
-			color: '#4970FF',
 		},
 		polling: true,
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
+		usableAsTool: true,
 		credentials: [
 			{
 				name: 'ninoxApi',
@@ -61,7 +61,7 @@ export class NinoxTrigger implements INodeType {
 				default: '',
 				placeholder: '',
 				required: true,
-				description: 'The ID of the team to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 				typeOptions: {
 					loadOptionsMethod: 'getTeams',
 				},
@@ -73,7 +73,7 @@ export class NinoxTrigger implements INodeType {
 				default: '',
 				placeholder: '',
 				required: true,
-				description: 'The ID of the database to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 				displayOptions: {
 					hide: {
 						teamId: [
@@ -105,7 +105,7 @@ export class NinoxTrigger implements INodeType {
 				typeOptions: {
 					loadOptionsMethod: 'getTables',
 				},
-				description: 'The ID of the table to access. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code-examples/expressions/">expression</a>.',
+				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			},	
 		],
 	};
@@ -120,10 +120,9 @@ export class NinoxTrigger implements INodeType {
 					{},
 					{},
 				);
-				// @ts-ignore
-				const returnData = teams.map((o) => ({
-					name: o.name,
-					value: o.id,
+				const returnData = (teams as IDataObject[]).map((o) => ({
+					name: o.name as string,
+					value: o.id as string,
 				})) as INodePropertyOptions[];
 				return returnData;
 			},
@@ -138,10 +137,9 @@ export class NinoxTrigger implements INodeType {
 					{},
 					{},
 				);
-				// @ts-ignore
-				const returnData = databases.map((o) => ({
-					name: o.name,
-					value: o.id,
+				const returnData = (databases as IDataObject[]).map((o) => ({
+					name: o.name as string,
+					value: o.id as string,
 				})) as INodePropertyOptions[];
 				return returnData;
 			},
@@ -157,10 +155,9 @@ export class NinoxTrigger implements INodeType {
 					{},
 					{},
 				);
-				// @ts-ignore
-				const returnData = tables.map((o) => ({
-					name: o.name,
-					value: o.id,
+				const returnData = (tables as IDataObject[]).map((o) => ({
+					name: o.name as string,
+					value: o.id as string,
 				})) as INodePropertyOptions[];
 				return returnData;
 			},

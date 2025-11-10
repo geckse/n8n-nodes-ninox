@@ -1,4 +1,4 @@
-import { INodePropertyOptions } from 'n8n-workflow';
+import { INodePropertyOptions, IExecuteSingleFunctions, INodeExecutionData, IDataObject, IN8nHttpFullResponse, INodeParameterResourceLocator } from 'n8n-workflow';
 import { createRecordsOptions } from '../actions/record/createRecords';
 import { updateRecordsOptions } from '../actions/record/updateRecords';
 import { uploadFileOptions } from '../actions/file/uploadFile';
@@ -301,7 +301,8 @@ export const v1Operations: INodePropertyOptions[] = [
 			},
 			output: {
 				postReceive: [
-					async function(this: any, items: any, responseData: any) {
+					async function(this: IExecuteSingleFunctions, items: INodeExecutionData[], response: IN8nHttpFullResponse) {
+						const responseData = response.body as IDataObject;
 						const parseAsJson = this.getNodeParameter('parseAsJson', 0) as boolean;
 						const splitIntoItems = this.getNodeParameter('splitIntoItems', 0) as boolean;
 						const fetchAsRecords = this.getNodeParameter('fetchAsRecords', 0) as boolean;
@@ -323,12 +324,12 @@ export const v1Operations: INodePropertyOptions[] = [
 
 								// Return the parsed data as a single item
 								return [{
-									json: jsonData,
+									json: jsonData as IDataObject,
 									pairedItem: { item: 0 },
 								}];
-							} catch (error: any) {
+							} catch (error: unknown) {
 								throw new Error(
-									`Failed to parse response as JSON: ${error.message}. ` +
+									`Failed to parse response as JSON: ${error instanceof Error ? error.message : String(error)}. ` +
 									`Response: ${JSON.stringify(responseData).substring(0, 200)}`
 								);
 							}
@@ -339,7 +340,7 @@ export const v1Operations: INodePropertyOptions[] = [
 							return items;
 						}
 
-						let arrayItems: any[] = [];
+						let arrayItems: unknown[] = [];
 
 						// First, extract the actual data from items if responseData is not the raw response
 						let actualData = responseData;
@@ -359,7 +360,8 @@ export const v1Operations: INodePropertyOptions[] = [
 							}
 						} else if (typeof actualData === 'string') {
 							// Handle comma-separated string (fallback)
-							arrayItems = actualData
+							const stringData: string = actualData;
+						arrayItems = stringData
 								.split(',')
 								.map((item: string) => item.trim())
 								.filter((item: string) => item.length > 0);
@@ -382,7 +384,7 @@ export const v1Operations: INodePropertyOptions[] = [
 						// If fetchAsRecords is enabled, treat items as record IDs and fetch them
 						if (fetchAsRecords) {
 							// Convert all items to strings for ID validation
-							const recordIds = arrayItems.map((id: any) => String(id).trim()).filter((id: string) => id.length > 0);
+							const recordIds = arrayItems.map((id: unknown) => String(id).trim()).filter((id: string) => id.length > 0);
 
 							// Validate that IDs look like valid record IDs (alphanumeric)
 							const invalidIds = recordIds.filter((id: string) => !/^[a-zA-Z0-9]+$/.test(id));
@@ -396,10 +398,14 @@ export const v1Operations: INodePropertyOptions[] = [
 							// Get the team and database parameters for the API calls
 							// Handle resourceLocator format for teamId and databaseId
 							const teamIdParam = this.getNodeParameter('teamId', 0);
-							const teamId = typeof teamIdParam === 'object' ? teamIdParam.value : teamIdParam;
+							const teamId = (typeof teamIdParam === 'object' && teamIdParam !== null && 'value' in teamIdParam
+								? (teamIdParam as INodeParameterResourceLocator).value
+								: teamIdParam) as string;
 
 							const databaseIdParam = this.getNodeParameter('databaseId', 0);
-							const databaseId = typeof databaseIdParam === 'object' ? databaseIdParam.value : databaseIdParam;
+							const databaseId = (typeof databaseIdParam === 'object' && databaseIdParam !== null && 'value' in databaseIdParam
+								? (databaseIdParam as INodeParameterResourceLocator).value
+								: databaseIdParam) as string;
 
 							// Fetch each record
 							const fetchedRecords = [];
@@ -420,7 +426,7 @@ export const v1Operations: INodePropertyOptions[] = [
 										'https://api.ninox.com/v1';
 
 									const options = {
-										method: 'GET',
+										method: 'GET' as const,
 										url: `${baseUrl}/teams/${teamId}/databases/${databaseId}/tables/${tableId}/records/${numericRecordId}`,
 										headers: {
 											'Authorization': `Bearer ${credentials.token}`,
@@ -429,26 +435,26 @@ export const v1Operations: INodePropertyOptions[] = [
 										},
 										json: true,
 									};
-									const record = await this.helpers.request(options);
+									const record = await this.helpers.httpRequest(options) as IDataObject;
 									fetchedRecords.push(record);
-								} catch (error: any) {
+								} catch (error: unknown) {
 									// Include error information for failed fetches
 									fetchedRecords.push({
 										id: recordId,
-										error: `Failed to fetch record: ${error.message}`,
+										error: `Failed to fetch record: ${error instanceof Error ? error.message : String(error)}`,
 									});
 								}
 							}
 
 							// Return the fetched records as individual items
-							return fetchedRecords.map((record: any) => ({
+							return fetchedRecords.map((record: IDataObject) => ({
 								json: record,
 								pairedItem: { item: 0 },
 							}));
 						} else {
 							// Just split into items without fetching
-							return arrayItems.map((item: any) => ({
-								json: typeof item === 'object' ? item : { value: item },
+							return arrayItems.map((item: unknown) => ({
+								json: (typeof item === 'object' && item !== null ? item : { value: item }) as IDataObject,
 								pairedItem: { item: 0 },
 							}));
 						}

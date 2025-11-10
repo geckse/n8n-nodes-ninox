@@ -13,7 +13,6 @@ export async function getTeams(
         {},
     ) as Array<{ id: string; name: string }>;
     const results: INodeListSearchItems[] = teams
-        // @ts-ignore
         .map((c) => ({
             name: c.name,
             value: c.id,
@@ -49,7 +48,6 @@ export async function getDatabases(
         {},
     ) as Array<{ id: string; name: string }>;
     const results: INodeListSearchItems[] = databases
-        // @ts-ignore
         .map((c) => ({
             name: c.name,
             value: c.id,
@@ -84,7 +82,6 @@ export async function getTables(
         {},
     ) as Array<{ id: string; name: string }>;
     const results: INodeListSearchItems[] = tables
-        // @ts-ignore
         .map((c) => ({
             name: c.name,
             value: c.id,

@@ -26,11 +26,10 @@ export const handleIncommingFile = async function (
 								},
 						};
 
-						if (items[i].binary !== undefined) {
+						if (items[i].binary !== undefined && newItem.binary !== undefined) {
 								// Create a shallow copy of the binary data so that the old
 								// data references which do not get changed still stay behind
 								// but the incoming data does not get changed.
-								// @ts-ignore
 								Object.assign(newItem.binary, items[i].binary);
 						}
 
@@ -40,11 +39,14 @@ export const handleIncommingFile = async function (
 						) as string;
 
 						// create buffer from body
-						// @ts-ignore
-						const data = Buffer.from(response.body as string);
+						const data = typeof response.body === 'string'
+							? Buffer.from(response.body)
+							: response.body instanceof Buffer
+						? response.body
+						: Buffer.from(response.body as ArrayBuffer);
 
 						newItem.binary![dataPropertyNameDownload] = await this.helpers.prepareBinaryData(
-								data as unknown as Buffer,
+								data,
 								dataPropertyNameDownload,
 								mimeType,
 						);  

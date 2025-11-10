@@ -11,7 +11,7 @@ export const v2Parameters: INodeProperties[] = [
 		noDataExpression: true,
 		options: [
 			{
-				name: 'Schemas',
+				name: 'Schema',
 				value: 'schema',
 			},
 			{
@@ -194,7 +194,7 @@ export const v2Parameters: INodeProperties[] = [
 				property: 'perPage',
 			},
 		},
-		default: 100,
+		default: 50,
 		description: 'Max number of results to return',
 	},
 
@@ -254,6 +254,46 @@ export const v2Parameters: INodeProperties[] = [
 		description: 'Additional options which decide which records should be returned',
 		placeholder: 'Add Option',
 		options: [
+			{
+				displayName: 'Filters',
+				name: 'filters',
+				description: 'Return records that meet the criteria defined as query parameters',
+				type: 'string',
+				placeholder: '{"fields": {"Email": "example@mail.com"}}',
+				routing: {
+					send: {
+						type: 'query',
+						property: 'filters',
+					},
+				},
+				default: '',
+			},
+			{
+				displayName: 'Since ID',
+				name: 'sinceId',
+				description: 'Show only records with a larger ID than the given ID',
+				type: 'number',
+				routing: {
+					send: {
+						type: 'query',
+						property: 'sinceId',
+					},
+				},
+				default: '',
+			},
+			{
+				displayName: 'Since Sequence',
+				name: 'sinceSq',
+				description: 'Show only records created or modified since this sync sequence number',
+				type: 'number',
+				routing: {
+					send: {
+						type: 'query',
+						property: 'sinceSq',
+					},
+				},
+				default: '',
+			},
 			{
 				displayName: 'Sort by Field',
 				name: 'sort',
@@ -320,20 +360,6 @@ export const v2Parameters: INodeProperties[] = [
 				],
 			},
 			{
-				displayName: 'Sort by Latest Modified',
-				name: 'sortUpdate',
-				description: 'Whether to show last changed records first (not combinable with order)',
-				type: 'boolean',
-				routing: {
-					send: {
-						type: 'query',
-						property: 'updated',
-						value: 'true',
-					},
-				},
-				default: true,
-			},
-			{
 				displayName: 'Sort by Latest Created',
 				name: 'sortNew',
 				description: 'Whether to show newest records first (not combinable with order)',
@@ -348,44 +374,18 @@ export const v2Parameters: INodeProperties[] = [
 				default: true,
 			},
 			{
-				displayName: 'Filters',
-				name: 'filters',
-				description: 'Return records that meet the criteria defined as query parameters',
-				type: 'string',
-				placeholder: '{"fields": {"Email": "example@mail.com"}}',
+				displayName: 'Sort by Latest Modified',
+				name: 'sortUpdate',
+				description: 'Whether to show last changed records first (not combinable with order)',
+				type: 'boolean',
 				routing: {
 					send: {
 						type: 'query',
-						property: 'filters',
+						property: 'updated',
+						value: 'true',
 					},
 				},
-				default: '',
-			},
-			{
-				displayName: 'Since ID',
-				name: 'sinceId',
-				description: 'Show only records with a larger ID than the given ID',
-				type: 'number',
-				routing: {
-					send: {
-						type: 'query',
-						property: 'sinceId',
-					},
-				},
-				default: '',
-			},
-			{
-				displayName: 'Since Sequence',
-				name: 'sinceSq',
-				description: 'Show only records created or modified since this sync sequence number',
-				type: 'number',
-				routing: {
-					send: {
-						type: 'query',
-						property: 'sinceSq',
-					},
-				},
-				default: '',
+				default: true,
 			}
 		],
 	},

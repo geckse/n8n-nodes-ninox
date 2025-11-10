@@ -40,9 +40,9 @@ export const createRecordsOptions = async function (
 		// remove fields that should not be sent
 		if (!addAllFields && bodyData.fields) {
 			const cleanedFields = {} as IDataObject;
+			const fieldsObject = bodyData.fields as IDataObject;
 			for (const field of fields) {
-				// @ts-ignore
-				cleanedFields[field] = bodyData.fields[field];
+				cleanedFields[field] = fieldsObject[field];
 			}
 			bodyData.fields = cleanedFields;
 		}

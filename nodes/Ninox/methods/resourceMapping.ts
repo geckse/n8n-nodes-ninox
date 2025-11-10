@@ -1,5 +1,5 @@
 import { apiRequest } from "../transport";
-import { ResourceMapperFields, ILoadOptionsFunctions, ResourceMapperField, FieldType } from "n8n-workflow";
+import { IDataObject, ResourceMapperFields, ILoadOptionsFunctions, ResourceMapperField, FieldType } from "n8n-workflow";
 
 type TypesMap = Partial<Record<FieldType, string[]>>;
 
@@ -39,13 +39,13 @@ export async function getFields(this: ILoadOptionsFunctions): Promise<ResourceMa
         '/teams/' + teamId + '/databases/' + databaseId + '/tables/' + tableId + '',
     );
 
-    const resourceFields: ResourceMapperField[] = (fields.fields || fields).map((o: any) => ({
+    const resourceFields: ResourceMapperField[] = (fields.fields || fields).map((o: IDataObject) => ({
         id: o.id,
         displayName: o.name,
         required: false,
         defaultMatch: o.id === 'id',
         display: true,
-        type: mapForeignType(o.type, ninoxTypesMap) || 'string',
+        type: mapForeignType((o.type as string) || 'string', ninoxTypesMap) || 'string',
         canBeUsedToMatch: o.id === 'id',
     }));
 

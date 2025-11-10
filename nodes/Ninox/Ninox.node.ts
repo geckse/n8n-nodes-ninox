@@ -20,7 +20,6 @@ export class Ninox implements INodeType {
 		description: 'Read, create, update and delete data from Ninox',
 		defaults: {
 			name: 'Ninox',
-			color: '#4970FF',
 		},
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
