@@ -15,7 +15,6 @@ This community package contains two powerful nodes to integrate your [Ninox](htt
 The node features a resource-based architecture with enhanced field mapping, schema access, and advanced filtering capabilities. Full backward compatibility with previous versions is maintained.
 
 - [Supported Operations](#supported-operations)
-- [Key Features](#key-features)
 - [Installation](#installation)
 - [Credentials](#credentials)
 - [Usage Examples](#usage-examples)
@@ -50,42 +49,6 @@ The node uses a **resource-based architecture** that organizes operations by typ
 | **Schema** | Get Database Schema | Retrieve the schema for a single database | - |
 | | Get Tables Schema | Retrieve the schema for all tables in a database | - |
 | | Get Single Table Schema | Retrieve the schema for a single table with field definitions | - |
-
-
-## Key Features
-
-### Resource-Based Architecture
-Operations are organized into three distinct resources for cleaner workflow design:
-- **Record**: Core CRUD operations and scripting
-- **File**: All file attachment operations
-- **Schema**: Metadata operations for database introspection
-
-### Smart Field Mapping
-- **Automatic Field Discovery**: Fields are dynamically loaded from your Ninox table schema
-- **Two Mapping Modes**:
-  - `Define Below`: Manually select and map specific fields
-  - `Auto-Map Input Data`: Automatically maps input data to matching fields
-- **Type Safety**: Intelligent type mapping between Ninox and n8n field types
-
-### Schema Operations
-Programmatic access to your database structure:
-- **Get Database Schema**: Retrieve metadata for an entire database
-- **Get Tables Schema**: List all tables with their properties
-- **Get Single Table Schema**: Detailed field definitions for a specific table
-
-### Advanced Data Filtering
-Enhanced options for the List operation:
-- Sort by any field (ascending/descending)
-- Sort by latest modified or created records
-- JSON-based filters for complex queries
-- Synchronization tracking with Since ID and Since Sequence parameters
-
-### Enhanced Ninox Script Execution
-Flexible script result handling:
-- **Parse As JSON**: Parse complex script responses as structured JSON
-- **Split Into Items**: Automatically split array results into individual workflow items
-- **Fetch As Records**: Automatically fetch full record data when script returns IDs
-- Intelligent record ID parsing with automatic table detection
 
 ## Installation
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
