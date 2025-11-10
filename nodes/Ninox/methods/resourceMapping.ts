@@ -49,7 +49,5 @@ export async function getFields(this: ILoadOptionsFunctions): Promise<ResourceMa
         canBeUsedToMatch: o.id === 'id',
     }));
 
-    console.log('resourceFields', resourceFields);
-
     return { fields: resourceFields };
 }

@@ -37,8 +37,6 @@ export async function getDatabases(
 ): Promise<INodeListSearchResult> {
 
     const teamId = (this.getCurrentNodeParameter('teamId') as INodeParameterResourceLocator).value;
-    
-    console.log('teamId', this.getCurrentNodeParameter('teamId'));
 
     const databases = await apiRequest.call(
         this,
