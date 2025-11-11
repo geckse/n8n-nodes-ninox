@@ -152,7 +152,7 @@ I hope you are enjoying these nodes. If you are in need of a smooth automation, 
 
 ## Version History
 
-### 2.1.0 (Current)
+### 2.1.7 (Current)
 - Enhanced Ninox Script operation with flexible result handling:
   - Added "Parse As JSON" option for complex data structures
   - Added "Split Into Items" to split array responses into individual items
