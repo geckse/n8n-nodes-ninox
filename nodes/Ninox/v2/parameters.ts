@@ -257,16 +257,35 @@ export const v2Parameters: INodeProperties[] = [
 			{
 				displayName: 'Filters',
 				name: 'filters',
-				description: 'Return records that meet the criteria defined as query parameters',
-				type: 'string',
-				placeholder: '{"fields": {"Email": "example@mail.com"}}',
-				routing: {
-					send: {
-						type: 'query',
-						property: 'filters',
-					},
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
 				},
-				default: '',
+				description: 'The filters to apply',
+				placeholder: 'Add Filter',
+				default: {},
+				options: [
+					{
+						name: 'filter',
+						displayName: 'Filter',
+						values: [
+							{
+								displayName: 'Field ID',
+								name: 'fieldId',
+								type: 'string',
+								default: '',
+								description: 'The ID of the field to filter by',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								description: 'The value to filter for',
+							},
+						],
+					},
+				],
 			},
 			{
 				displayName: 'Since ID',

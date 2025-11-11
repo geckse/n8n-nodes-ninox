@@ -1,6 +1,7 @@
 import { INodePropertyOptions, IExecuteSingleFunctions, INodeExecutionData, IDataObject, IN8nHttpFullResponse, INodeParameterResourceLocator } from 'n8n-workflow';
 import { createRecordsOptions } from '../actions/record/createRecords';
 import { updateRecordsOptions } from '../actions/record/updateRecords';
+import { listRecordsOptions } from '../actions/record/listRecords';
 import { uploadFileOptions } from '../actions/file/uploadFile';
 import { handleIncommingFile } from '../actions/file/handleIncommingFile';
 
@@ -14,6 +15,9 @@ export const v2Operations: INodePropertyOptions[] = [
 			request: {
 				method: 'GET',
 				url: '=teams/{{$parameter.teamId}}/databases/{{$parameter.databaseId}}/tables/{{$parameter.tableId}}/records',
+			},
+			send: {
+				preSend: [listRecordsOptions],
 			},
 			operations: {
 				pagination: async function(this, requestOptions) {
