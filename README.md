@@ -39,9 +39,9 @@ The node uses a **resource-based architecture** that organizes operations by typ
 | **Record** | List  | List records of a table | Return all records OR Paginate with advanced filtering: Sort by field/latest modified/created, Filters (JSON), Since ID, Since Sequence  |
 | | Read  | Get record of a table by ID | - |
 | | Create  | Create a new record in a table | Smart field mapping with resourceMapper: auto-map input data or define specific fields |
-| | Update  | Update a record in a table by ID | Smart field mapping with resourceMapper: auto-map input data or define specific fields |
+| | Update  | Update a record in a table by ID | Smart field mapping with resourceMapper, Upsert (insert if not exists) |
 | | Delete  | Delete a record in a table by ID | - |
-| | Ninox Script | Send and run a Ninox Script to query data or run actions on your Ninox database | Parse As JSON, Split Into Items, Fetch As Records |
+| | Ninox Script | Send and run a Ninox Script to query data or run actions on your Ninox database | Read Only Queries (GET method), Parse As JSON, Split Into Items, Fetch As Records |
 | **File** | List Attached Files  | Get the attached files of a record by ID | - |
 | | Download Attached File | Get the actual binary of a attachment by file name | - |
 | | Upload File Attachment | Upload a new file to record | Optional: Add an Attachment Field ID or Name to upload into specific field |
@@ -127,6 +127,9 @@ Use together with "Split Into Items" when your script returns record IDs. This o
 
 **Note:** The Fetch As Records option automatically extracts the table ID from the record ID format (e.g., "B78670" → table "B", record "78670").
 
+#### Read Only Queries
+Enable this option to use GET method instead of POST for read-only Ninox Scripts. Useful for queries that only retrieve data without making changes.
+
 ## Compatibility
 
 The Latest Version of n8n. If you encounter any problem, feel free to [open an issue](https://github.com/geckse/n8n-nodes-ninox) on Github. 
@@ -152,7 +155,12 @@ I hope you are enjoying these nodes. If you are in need of a smooth automation, 
 
 ## Version History
 
-### 2.1.7 (Current)
+### 2.2.0 (Current)
+- Added "Read Only Queries" toggle to Ninox Script operation for GET method support
+- Added "Upsert" toggle to Update operation (insert if record doesn't exist)
+- Fixed empty response handling to return empty items instead of errors
+
+### 2.1.7
 - Enhanced Ninox Script operation with flexible result handling:
   - Added "Parse As JSON" option for complex data structures
   - Added "Split Into Items" to split array responses into individual items
