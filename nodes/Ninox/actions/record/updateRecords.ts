@@ -13,6 +13,7 @@ export const updateRecordsOptions = async function (
 		const item = this.getInputData() as INodeExecutionData;
 		const recordId = this.getNodeParameter('recordId');
 		const nodeVersion = this.getNode().typeVersion;
+		const upsert = this.getNodeParameter('upsert', false) as boolean;
 
 		let bodyData = {} as IDataObject;
 
@@ -81,6 +82,11 @@ export const updateRecordsOptions = async function (
 
 		if(bodyData.id !== recordId){
 				throw new Error('The Record ID does not match the provided recordId. Consider using an expression to dynamical update multiple records.');
+		}
+
+		// Add upsert flag if enabled
+		if (upsert) {
+			bodyData._upsert = true;
 		}
 
 		// and add it

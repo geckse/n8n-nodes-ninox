@@ -34,6 +34,20 @@ export const v1Parameters: INodeProperties[] = [
 		required: true,
 		description: 'Update a record. Use an expression to update many incoming records.',
 	},
+	// v1 Update upsert toggle
+	{
+		displayName: 'Upsert',
+		name: 'upsert',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				'@version': [1],
+				operation: ['update'],
+			},
+		},
+		default: false,
+		description: 'Whether to insert a new record if the record with the given ID does not exist. When enabled, the operation will update existing records or create new ones.',
+	},
 	// v1 Delete recordId
 	{
 		displayName: 'Record ID',
