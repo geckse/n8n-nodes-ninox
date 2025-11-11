@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-ninox",
-  "version": "2.1.7",
+  "version": "2.2.0",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
