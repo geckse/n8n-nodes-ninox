@@ -1,7 +1,9 @@
 {
   "name": "n8n-nodes-ninox",
-  "version": "2.1.5",
-  "publishConfig": { "registry": "https://registry.npmjs.org/" },
+  "version": "2.1.6",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "description": "This package contains two nodes for n8n to interact with Ninox.",
   "keywords": [
     "n8n-community-node-package",
