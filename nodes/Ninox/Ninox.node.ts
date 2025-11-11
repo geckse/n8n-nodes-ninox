@@ -92,10 +92,10 @@ export class Ninox implements INodeType {
 			},
 
 			// ----------------------------------
-			//         Shared Parameters (Team, Database, Table, Script, parseAsJson, splitIntoItems, fetchAsRecords)
+			//         Shared Parameters (Team, Database, Table, Script, readOnlyQuery, parseAsJson, splitIntoItems, fetchAsRecords)
 			// ----------------------------------
 			...sharedParameters.filter(p =>
-				['teamId', 'databaseId', 'tableId', 'script', 'parseAsJson', 'splitIntoItems', 'fetchAsRecords'].includes(p.name)
+				['teamId', 'databaseId', 'tableId', 'readOnlyQuery', 'script', 'parseAsJson', 'splitIntoItems', 'fetchAsRecords'].includes(p.name)
 			),
 
 			// ----------------------------------

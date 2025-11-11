@@ -183,6 +183,18 @@ export const sharedParameters: INodeProperties[] = [
 	//         Ninox Script Parameter (shared for both v1 and v2)
 	// ----------------------------------
 	{
+		displayName: 'Read Only Queries',
+		name: 'readOnlyQuery',
+		type: 'boolean',
+		displayOptions: {
+			show: {
+				operation: ['ninoxScript'],
+			},
+		},
+		default: false,
+		description: 'Whether to use GET method for read-only queries instead of POST. Enable this for queries that only read data without making changes.',
+	},
+	{
 		displayName: 'Ninox Script',
 		name: 'script',
 		type: 'string',
@@ -192,12 +204,6 @@ export const sharedParameters: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				operation: ['ninoxScript'],
-			},
-		},
-		routing: {
-			send: {
-				type: 'body',
-				property: 'query',
 			},
 		},
 		description: 'Use an Ninox Script to build your own query',

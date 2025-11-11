@@ -1,4 +1,4 @@
-import { INodePropertyOptions, IExecuteSingleFunctions, INodeExecutionData, IDataObject, IN8nHttpFullResponse, INodeParameterResourceLocator } from 'n8n-workflow';
+import { INodePropertyOptions, IExecuteSingleFunctions, INodeExecutionData, IDataObject, IN8nHttpFullResponse, INodeParameterResourceLocator, IHttpRequestOptions } from 'n8n-workflow';
 import { createRecordsOptions } from '../actions/record/createRecords';
 import { updateRecordsOptions } from '../actions/record/updateRecords';
 import { uploadFileOptions } from '../actions/file/uploadFile';
@@ -297,15 +297,52 @@ export const v1Operations: INodePropertyOptions[] = [
 			},
 			send: {
 				paginate: false,
-				type: 'body',
+				preSend: [
+					async function(this: IExecuteSingleFunctions, requestOptions: IHttpRequestOptions) {
+						const readOnlyQuery = this.getNodeParameter('readOnlyQuery', 0) as boolean;
+						const script = this.getNodeParameter('script', 0) as string;
+
+						if (readOnlyQuery) {
+							// Switch to GET method and move query to query params
+							requestOptions.method = 'GET';
+							requestOptions.qs = requestOptions.qs || {};
+							(requestOptions.qs as IDataObject).query = script;
+							// Remove from body if it exists
+							if (requestOptions.body && typeof requestOptions.body === 'object') {
+								delete (requestOptions.body as IDataObject).query;
+							}
+						} else {
+							// Use POST with body (default behavior)
+							requestOptions.method = 'POST';
+							requestOptions.body = requestOptions.body || {};
+							(requestOptions.body as IDataObject).query = script;
+						}
+
+						return requestOptions;
+					},
+				],
 			},
 			output: {
 				postReceive: [
 					async function(this: IExecuteSingleFunctions, items: INodeExecutionData[], response: IN8nHttpFullResponse) {
-						const responseData = response.body as IDataObject;
+						const responseData = response.body;
 						const parseAsJson = this.getNodeParameter('parseAsJson', 0) as boolean;
 						const splitIntoItems = this.getNodeParameter('splitIntoItems', 0) as boolean;
 						const fetchAsRecords = this.getNodeParameter('fetchAsRecords', 0) as boolean;
+
+						// Check if response is empty/null/undefined
+						const isEmpty = responseData === null ||
+							responseData === undefined ||
+							responseData === '' ||
+							(typeof responseData === 'object' && !Array.isArray(responseData) && Object.keys(responseData as IDataObject).length === 0);
+
+						// If response is empty, return empty item
+						if (isEmpty) {
+							return [{
+								json: {},
+								pairedItem: { item: 0 },
+							}];
+						}
 
 						// If parseAsJson is enabled, parse the entire response as JSON
 						if (parseAsJson) {
@@ -365,6 +402,9 @@ export const v1Operations: INodePropertyOptions[] = [
 								.split(',')
 								.map((item: string) => item.trim())
 								.filter((item: string) => item.length > 0);
+						} else if (actualData === null || actualData === undefined) {
+							// Handle null/undefined as empty array
+							arrayItems = [];
 						} else {
 							throw new Error(
 								`Script did not return an array or string to split. ` +
@@ -374,11 +414,12 @@ export const v1Operations: INodePropertyOptions[] = [
 							);
 						}
 
+						// If no items, return empty item instead of error
 						if (arrayItems.length === 0) {
-							throw new Error(
-								'Script returned no items to split. ' +
-								'Please check your script or disable "Split Into Items" option.'
-							);
+							return [{
+								json: {},
+								pairedItem: { item: 0 },
+							}];
 						}
 
 						// If fetchAsRecords is enabled, treat items as record IDs and fetch them
